@@ -190,102 +190,202 @@ async function refresh() {
       orders.length
 
         ? orders.map(
-            order => `
+            order => {
 
-            <div class="admin-row">
+              let items = [];
 
-              <div>
+              try {
 
-                <b>
-                  ${escapeHTML(
-                    order.customer_name || ""
-                  )}
-                </b>
+                items =
+                  Array.isArray(order.items)
+                    ? order.items
+                    : JSON.parse(
+                        order.items || "[]"
+                      );
 
-                <p>
+              }
 
-                  ${escapeHTML(
-                    order.phone || ""
-                  )}
+              catch {
 
-                  —
+                items = [];
 
-                  ${escapeHTML(
-                    order.wilaya || ""
-                  )}
+              }
 
-                  —
 
-                  ${order.total || 0} DA
+              return `
 
-                </p>
+              <div class="admin-row order-admin-row">
 
-                <small>
+                <div class="order-content">
 
-                  ${escapeHTML(
-                    order.address || ""
-                  )}
+                  <b>
+                    ${escapeHTML(
+                      order.customer_name || ""
+                    )}
+                  </b>
 
-                </small>
+                  <p>
+
+                    ${escapeHTML(
+                      order.phone || ""
+                    )}
+
+                    —
+
+                    ${escapeHTML(
+                      order.wilaya || ""
+                    )}
+
+                    —
+
+                    ${order.total || 0} DA
+
+                  </p>
+
+                  <small>
+
+                    ${escapeHTML(
+                      order.address || ""
+                    )}
+
+                  </small>
+
+
+                  <div class="order-products">
+
+                    ${
+                      items.length
+
+                        ? items.map(
+                            item => {
+
+                              const product =
+                                products.find(
+                                  p =>
+                                    String(p.id) ===
+                                    String(item.id)
+                                );
+
+
+                              const image =
+                                item.image ||
+                                product?.image ||
+                                "";
+
+
+                              return `
+
+                              <div class="order-product">
+
+                                ${
+                                  image
+                                    ? `
+                                    <img
+                                      src="${escapeHTML(image)}"
+                                      alt=""
+                                    >
+                                    `
+                                    : `
+                                    <div class="no-product-image">
+                                      لا صورة
+                                    </div>
+                                    `
+                                }
+
+                                <div>
+
+                                  <strong>
+                                    ${escapeHTML(
+                                      item.name || ""
+                                    )}
+                                  </strong>
+
+                                  <span>
+                                    ${Number(
+                                      item.price || 0
+                                    ).toLocaleString("fr-DZ")}
+                                    DA
+                                  </span>
+
+                                </div>
+
+                              </div>
+
+                              `;
+
+                            }
+                          ).join("")
+
+                        : `
+                          <small class="muted">
+                            لا توجد معلومات المنتجات
+                          </small>
+                          `
+                    }
+
+                  </div>
+
+                </div>
+
+
+                <select
+                  onchange="statusOrder(
+                    ${order.id},
+                    this.value
+                  )"
+                >
+
+                  <option
+                    ${
+                      order.status === "جديد"
+                        ? "selected"
+                        : ""
+                    }
+                  >
+                    جديد
+                  </option>
+
+                  <option
+                    ${
+                      order.status === "مؤكد"
+                        ? "selected"
+                        : ""
+                    }
+                  >
+                    مؤكد
+                  </option>
+
+                  <option
+                    ${
+                      order.status === "تم التوصيل"
+                        ? "selected"
+                        : ""
+                    }
+                  >
+                    تم التوصيل
+                  </option>
+
+                  <option
+                    ${
+                      order.status === "ملغى"
+                        ? "selected"
+                        : ""
+                    }
+                  >
+                    ملغى
+                  </option>
+
+                </select>
 
               </div>
 
+              `;
 
-              <select
-                onchange="statusOrder(
-                  ${order.id},
-                  this.value
-                )"
-              >
-
-                <option
-                  ${
-                    order.status === "جديد"
-                      ? "selected"
-                      : ""
-                  }
-                >
-                  جديد
-                </option>
-
-                <option
-                  ${
-                    order.status === "مؤكد"
-                      ? "selected"
-                      : ""
-                  }
-                >
-                  مؤكد
-                </option>
-
-                <option
-                  ${
-                    order.status === "تم التوصيل"
-                      ? "selected"
-                      : ""
-                  }
-                >
-                  تم التوصيل
-                </option>
-
-                <option
-                  ${
-                    order.status === "ملغى"
-                      ? "selected"
-                      : ""
-                  }
-                >
-                  ملغى
-                </option>
-
-              </select>
-
-            </div>
-
-          `
+            }
           ).join("")
 
         : "<p class='muted'>لا توجد طلبات.</p>";
+
 
   }
 
