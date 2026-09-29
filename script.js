@@ -1,1284 +1,1037 @@
-// ================================
-// SHADOW STORE - SUPABASE
-// ================================
+* {
+  box-sizing: border-box;
+}
 
-const SUPABASE_URL = "https://knjdouprbwkxcuqyhpvh.supabase.co";
+html {
+  scroll-behavior: smooth;
+}
 
-// ⚠️ ضع Publishable Key تاعك هنا فقط
-const SUPABASE_KEY = "sb_publishable_iNdVPUDh7LRiQ27JX3smyA_C345zSB_";
+body {
+  margin: 0;
+  background: #070707;
+  color: #f5f5f5;
+  font-family: Arial, Helvetica, sans-serif;
+}
 
-const ADMIN_PASSWORD = "2412822010";
+a {
+  text-decoration: none;
+  color: inherit;
+}
 
-// WhatsApp
-const WHATSAPP = "213696380625";
-
-let products = [];
-let delivery = [];
-let orders = [];
-let settings = {
-  default_price: 2600,
-  whatsapp: WHATSAPP
-};
-
-let cart = [];
-
-
-// ================================
-// SUPABASE REQUEST
-// ================================
-
-async function supabaseRequest(endpoint, options = {}) {
-  const response = await fetch(
-    `${SUPABASE_URL}/rest/v1/${endpoint}`,
-    {
-      ...options,
-      headers: {
-        "apikey": SUPABASE_KEY,
-        "Authorization": `Bearer ${SUPABASE_KEY}`,
-        "Content-Type": "application/json",
-        "Prefer": options.method === "POST"
-          ? "return=representation"
-          : "return=minimal",
-        ...(options.headers || {})
-      }
-    }
-  );
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(errorText || "Supabase error");
-  }
-
-  const text = await response.text();
-
-  return text ? JSON.parse(text) : null;
+button,
+input,
+select {
+  font: inherit;
 }
 
 
-// ================================
-// LOAD ALL DATA
-// ================================
+/* HEADER */
 
-async function loadProducts() {
-  products = await supabaseRequest(
-    "products?select=*&order=id.asc"
-  );
+.topbar {
 
-  renderProducts();
-  renderAdminProducts();
+  height: 76px;
+
+  position: sticky;
+  top: 0;
+
+  z-index: 20;
+
+  background: rgba(5,5,5,.94);
+
+  backdrop-filter: blur(12px);
+
+  border-bottom: 1px solid #202020;
+
+  display: flex;
+
+  align-items: center;
+
+  padding: 0 5%;
+
+  gap: 25px;
 }
 
 
-async function loadDelivery() {
-  delivery = await supabaseRequest(
-    "delivery?select=*&order=id.asc"
-  );
+.brand {
 
-  renderWilayas();
-  renderAdminDelivery();
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  font-weight: 900;
+
+  letter-spacing: 2px;
+
+  font-size: 20px;
 }
 
 
-async function loadOrders() {
-  orders = await supabaseRequest(
-    "orders?select=*&order=id.desc"
-  );
+.brand img {
 
-  renderAdminOrders();
-  updateStats();
+  width: 43px;
+
+  height: 43px;
+
+  object-fit: cover;
+
+  border-radius: 50%;
 }
 
 
-async function loadSettings() {
+.topbar nav {
 
-  const data = await supabaseRequest(
-    "settings?select=*&order=id.asc"
-  );
+  display: flex;
 
-  data.forEach(item => {
+  gap: 22px;
 
-    if (item.key === "default_price") {
-      settings.default_price = Number(item.value) || 2600;
-    }
+  align-items: center;
 
-    if (item.key === "whatsapp") {
-      settings.whatsapp = item.value || WHATSAPP;
-    }
-
-  });
-
-  const priceInput = document.getElementById("defaultPrice");
-  const waInput = document.getElementById("waNumber");
-
-  if (priceInput) {
-    priceInput.value = settings.default_price;
-  }
-
-  if (waInput) {
-    waInput.value = settings.whatsapp;
-  }
+  margin-right: auto;
 }
 
 
-// ================================
-// PRODUCTS
-// ================================
+.topbar nav a {
 
-function parseSizes(value) {
+  color: #bbb;
 
-  if (!value) return [];
-
-  if (Array.isArray(value)) {
-    return value;
-  }
-
-  try {
-    const parsed = JSON.parse(value);
-
-    if (Array.isArray(parsed)) {
-      return parsed;
-    }
-  } catch {}
-
-  return String(value)
-    .split(",")
-    .map(x => x.trim())
-    .filter(Boolean);
+  font-size: 14px;
 }
 
 
-function renderProducts() {
+.topbar nav a:hover {
 
-  const grid = document.getElementById("productGrid");
-
-  if (!grid) return;
-
-  if (!products.length) {
-
-    grid.innerHTML = `
-      <div style="
-        grid-column:1/-1;
-        text-align:center;
-        padding:50px;
-        color:#777;
-      ">
-        لا توجد منتجات حاليًا
-      </div>
-    `;
-
-    return;
-  }
-
-  grid.innerHTML = products.map(product => {
-
-    const sizes = parseSizes(product.sizes);
-
-    const sizeOptions = sizes.length
-      ? sizes.map(size =>
-          `<option value="${escapeHTML(size)}">${escapeHTML(size)}</option>`
-        ).join("")
-      : `<option value="">اختار المقاس</option>`;
-
-    return `
-      <article class="product-card">
-
-        <img
-          class="product-image"
-          src="${escapeAttribute(product.image || "")}"
-          alt="${escapeAttribute(product.name)}"
-          onerror="this.style.opacity='.2'"
-        >
-
-        <div class="product-info">
-
-          <h3>${escapeHTML(product.name)}</h3>
-
-          <p class="description">
-            ${escapeHTML(product.description || "")}
-          </p>
-
-          <div class="price">
-            ${Number(product.price).toLocaleString()} DA
-          </div>
-
-          <div class="sizes">
-            ${sizes.length
-              ? "المقاسات: " + sizes.map(escapeHTML).join(" / ")
-              : "المقاسات غير محددة"}
-          </div>
-
-          <div class="product-actions">
-
-            <select id="size-${product.id}">
-              ${sizeOptions}
-            </select>
-
-            <button
-              class="btn"
-              onclick="addToCart(${product.id})"
-            >
-              أضف
-            </button>
-
-          </div>
-
-        </div>
-
-      </article>
-    `;
-
-  }).join("");
+  color: #fff;
 }
 
 
-// ================================
-// CART
-// ================================
+.admin-btn {
 
-function addToCart(productId) {
+  background: none;
 
-  const product = products.find(
-    p => Number(p.id) === Number(productId)
-  );
+  border: 1px solid #333;
 
-  if (!product) return;
+  color: #ddd;
 
-  const select = document.getElementById(`size-${productId}`);
+  padding: 8px 14px;
 
-  const size = select ? select.value : "";
+  border-radius: 7px;
 
-  if (parseSizes(product.sizes).length && !size) {
-    alert("اختار المقاس أولًا");
-    return;
-  }
-
-  cart.push({
-    product_id: product.id,
-    name: product.name,
-    price: Number(product.price),
-    size: size
-  });
-
-  renderCart();
-
-  document.getElementById("order")?.scrollIntoView({
-    behavior: "smooth"
-  });
+  cursor: pointer;
 }
 
 
-function removeFromCart(index) {
+.cart-btn {
 
-  cart.splice(index, 1);
+  background: #e50914;
 
-  renderCart();
+  color: #fff;
+
+  border: 0;
+
+  border-radius: 8px;
+
+  padding: 9px 14px;
+
+  cursor: pointer;
 }
 
 
-function renderCart() {
+/* HERO */
 
-  const box = document.getElementById("cartList");
+.hero {
 
-  if (!box) return;
+  min-height: 650px;
 
-  if (!cart.length) {
+  padding: 70px 7%;
 
-    box.innerHTML = `
-      <div style="color:#777;text-align:center;padding:20px">
-        السلة فارغة
-      </div>
-    `;
+  display: grid;
 
-  } else {
+  grid-template-columns: 1fr 1.1fr;
 
-    box.innerHTML = cart.map((item, index) => `
-      <div class="cart-item">
+  align-items: center;
 
-        <div>
-          <strong>${escapeHTML(item.name)}</strong>
-          <div style="color:#888;font-size:13px">
-            ${item.size ? "المقاس: " + escapeHTML(item.size) : ""}
-          </div>
-        </div>
+  gap: 50px;
 
-        <div>
-          ${item.price.toLocaleString()} DA
-          <button onclick="removeFromCart(${index})">×</button>
-        </div>
-
-      </div>
-    `).join("");
-  }
-
-  updateTotals();
+  direction: ltr;
 }
 
 
-function getSubtotal() {
+.hero-copy {
 
-  return cart.reduce(
-    (sum, item) => sum + Number(item.price),
-    0
-  );
+  direction: rtl;
 }
 
 
-function getDeliveryPrice() {
+.eyebrow {
 
-  const select = document.getElementById("wilaya");
+  font-size: 12px;
 
-  if (!select || !select.value) return 0;
+  letter-spacing: 3px;
 
-  const selected = delivery.find(
-    d => d.name === select.value
-  );
+  color: #aaa;
 
-  return selected ? Number(selected.price) : 0;
+  margin: 0 0 14px;
 }
 
 
-function updateTotals() {
+.hero h1 {
 
-  const subtotal = getSubtotal();
-  const deliveryPrice = getDeliveryPrice();
-  const total = subtotal + deliveryPrice;
+  font-size: clamp(55px, 8vw, 105px);
 
-  const subtotalEl = document.getElementById("subtotal");
-  const deliveryEl = document.getElementById("deliveryFee");
-  const totalEl = document.getElementById("total");
+  line-height: .86;
 
-  if (subtotalEl) {
-    subtotalEl.textContent = subtotal.toLocaleString();
-  }
+  margin: 0;
 
-  if (deliveryEl) {
-    deliveryEl.textContent = deliveryPrice.toLocaleString();
-  }
+  font-weight: 950;
 
-  if (totalEl) {
-    totalEl.textContent = total.toLocaleString();
-  }
+  letter-spacing: -5px;
 }
 
 
-// ================================
-// WILAYAS
-// ================================
+.hero h1 span {
 
-function renderWilayas() {
-
-  const select = document.getElementById("wilaya");
-
-  if (!select) return;
-
-  select.innerHTML = `
-    <option value="">اختار الولاية</option>
-  `;
-
-  delivery.forEach(item => {
-
-    select.innerHTML += `
-      <option value="${escapeAttribute(item.name)}">
-        ${escapeHTML(item.name)} — ${Number(item.price).toLocaleString()} DA
-      </option>
-    `;
-
-  });
-
-  select.onchange = updateTotals;
+  color: #e50914;
 }
 
 
-// ================================
-// SEND ORDER
-// ================================
+.hero-copy > p:not(.eyebrow) {
 
-async function sendOrder() {
+  color: #aaa;
 
-  if (!cart.length) {
-    alert("السلة فارغة");
-    return;
-  }
-
-  const name =
-    document.getElementById("customerName")?.value.trim();
-
-  const phone =
-    document.getElementById("customerPhone")?.value.trim();
-
-  const wilaya =
-    document.getElementById("wilaya")?.value;
-
-  if (!name || !phone || !wilaya) {
-    alert("أكمل معلومات الطلب");
-    return;
-  }
-
-  const subtotal = getSubtotal();
-  const deliveryPrice = getDeliveryPrice();
-  const total = subtotal + deliveryPrice;
-
-  const orderItems = cart.map(item => ({
-    product_id: item.product_id,
-    name: item.name,
-    price: item.price,
-    size: item.size
-  }));
-
-  try {
-
-    const result = await supabaseRequest(
-      "orders",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          customer_name: name,
-          phone: phone,
-          wilaya: wilaya,
-          address: "",
-          total: total,
-          status: "جديد",
-          items: orderItems
-        }),
-        headers: {
-          "Prefer": "return=representation"
-        }
-      }
-    );
-
-    const orderId =
-      result && result[0]
-        ? result[0].id
-        : "";
-
-    let message =
-`🖤 *SHADOW - NOUVELLE COMMANDE*
-
-📦 Commande: #${orderId}
-
-👤 الاسم: ${name}
-📱 الهاتف: ${phone}
-📍 الولاية: ${wilaya}
-
-🛍️ المنتجات:
-`;
-
-    cart.forEach((item, index) => {
-
-      message +=
-`${index + 1}. ${item.name}
-المقاس: ${item.size || "-"}
-السعر: ${Number(item.price).toLocaleString()} DA
-
-`;
-
-    });
-
-    message +=
-`🚚 التوصيل: ${deliveryPrice.toLocaleString()} DA
-💰 المجموع: ${total.toLocaleString()} DA`;
-
-    const url =
-      `https://wa.me/${settings.whatsapp}?text=${encodeURIComponent(message)}`;
-
-    window.open(url, "_blank");
-
-    cart = [];
-
-    renderCart();
-
-    document.getElementById("customerName").value = "";
-    document.getElementById("customerPhone").value = "";
-    document.getElementById("wilaya").value = "";
-
-    await loadOrders();
-
-    alert("تم تسجيل الطلب بنجاح");
-
-  } catch (error) {
-
-    console.error(error);
-
-    alert(
-      "حدث خطأ أثناء تسجيل الطلب.\n\n" +
-      "تأكد من اتصال Supabase."
-    );
-  }
+  font-size: 18px;
 }
 
 
-// ================================
-// ADMIN LOGIN
-// ================================
+.main-btn {
 
-function openAdmin() {
+  display: inline-block;
 
-  const modal = document.getElementById("adminModal");
+  margin-top: 20px;
 
-  if (modal) {
-    modal.classList.remove("hidden");
-  }
+  background: #e50914;
 
+  color: #fff;
+
+  border: 0;
+
+  padding: 14px 25px;
+
+  border-radius: 5px;
+
+  font-weight: 800;
+
+  cursor: pointer;
 }
 
 
-function closeAdmin() {
+.main-btn:hover {
 
-  const modal = document.getElementById("adminModal");
-
-  if (modal) {
-    modal.classList.add("hidden");
-  }
-
+  background: #c70710;
 }
 
 
-async function loginAdmin() {
+/* HERO IMAGES */
 
-  const password =
-    document.getElementById("adminPassword")?.value;
+.hero-images {
 
-  if (password !== ADMIN_PASSWORD) {
+  display: grid;
 
-    alert("كلمة السر خاطئة");
+  grid-template-columns: 1fr 1fr;
 
-    return;
-  }
-
-  document.getElementById("loginBox")
-    ?.classList.add("hidden");
-
-  document.getElementById("adminPanel")
-    ?.classList.remove("hidden");
-
-  await loadProducts();
-  await loadDelivery();
-  await loadOrders();
-  await loadSettings();
-
-  updateStats();
+  gap: 12px;
 }
 
 
-// ================================
-// ADMIN TABS
-// ================================
+.hero-images img {
 
-function showAdminTab(tabId) {
+  width: 100%;
 
-  document
-    .querySelectorAll(".admin-tab")
-    .forEach(tab => tab.classList.add("hidden"));
+  height: 270px;
 
-  document
-    .getElementById(tabId)
-    ?.classList.remove("hidden");
+  object-fit: cover;
+
+  border-radius: 12px;
+
+  filter: brightness(.82);
+
+  border: 1px solid #252525;
 }
 
 
-// ================================
-// ADMIN PRODUCTS
-// ================================
+.hero-images img:first-child {
 
-function renderAdminProducts() {
+  height: 420px;
 
-  const box = document.getElementById("adminProducts");
-
-  if (!box) return;
-
-  box.innerHTML = products.map(product => {
-
-    return `
-      <div class="admin-item">
-
-        <img
-          src="${escapeAttribute(product.image || "")}"
-          alt=""
-        >
-
-        <div class="admin-item-info">
-
-          <strong>
-            ${escapeHTML(product.name)}
-          </strong>
-
-          <small>
-            ${Number(product.price).toLocaleString()} DA
-          </small>
-
-        </div>
-
-        <div class="admin-actions">
-
-          <button onclick="editProduct(${product.id})">
-            تعديل
-          </button>
-
-          <button onclick="deleteProduct(${product.id})">
-            حذف
-          </button>
-
-        </div>
-
-      </div>
-    `;
-
-  }).join("");
+  grid-row: span 2;
 }
 
 
-async function addProduct() {
+/* FEATURES */
 
-  const name =
-    document.getElementById("newName")?.value.trim();
+.features {
 
-  const price =
-    Number(document.getElementById("newPrice")?.value);
+  display: grid;
 
-  const image =
-    document.getElementById("newImage")?.value.trim();
+  grid-template-columns: repeat(4,1fr);
 
-  const sizes =
-    document.getElementById("newSizes")?.value.trim();
+  gap: 1px;
 
-  const description =
-    document.getElementById("newDescription")?.value.trim();
+  background: #222;
 
-  if (!name || !price) {
-    alert("اكتب اسم المنتج والسعر");
-    return;
-  }
+  border-top: 1px solid #222;
 
-  try {
-
-    await supabaseRequest(
-      "products",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          name,
-          price,
-          image,
-          sizes,
-          description
-        }),
-        headers: {
-          "Prefer": "return=representation"
-        }
-      }
-    );
-
-    document.getElementById("newName").value = "";
-    document.getElementById("newPrice").value = "";
-    document.getElementById("newImage").value = "";
-    document.getElementById("newSizes").value = "";
-    document.getElementById("newDescription").value = "";
-
-    await loadProducts();
-
-    alert("تمت إضافة المنتج");
-
-  } catch (error) {
-
-    console.error(error);
-    alert("حدث خطأ أثناء إضافة المنتج");
-  }
+  border-bottom: 1px solid #222;
 }
 
 
-async function editProduct(id) {
+.features div {
 
-  const product =
-    products.find(p => Number(p.id) === Number(id));
+  background: #0b0b0b;
 
-  if (!product) return;
+  padding: 25px;
 
-  const name =
-    prompt("اسم المنتج:", product.name);
+  text-align: center;
 
-  if (name === null) return;
-
-  const price =
-    prompt("السعر:", product.price);
-
-  if (price === null) return;
-
-  const image =
-    prompt("رابط الصورة:", product.image || "");
-
-  if (image === null) return;
-
-  const sizes =
-    prompt(
-      "المقاسات مثال S,M,L,XL:",
-      parseSizes(product.sizes).join(",")
-    );
-
-  if (sizes === null) return;
-
-  const description =
-    prompt(
-      "الوصف:",
-      product.description || ""
-    );
-
-  if (description === null) return;
-
-  try {
-
-    await supabaseRequest(
-      `products?id=eq.${id}`,
-      {
-        method: "PATCH",
-        body: JSON.stringify({
-          name,
-          price: Number(price),
-          image,
-          sizes,
-          description
-        })
-      }
-    );
-
-    await loadProducts();
-
-    alert("تم تعديل المنتج");
-
-  } catch (error) {
-
-    console.error(error);
-    alert("حدث خطأ أثناء تعديل المنتج");
-  }
+  color: #aaa;
 }
 
 
-async function deleteProduct(id) {
+.features b {
 
-  if (!confirm("هل تريد حذف هذا المنتج؟")) {
-    return;
-  }
-
-  try {
-
-    await supabaseRequest(
-      `products?id=eq.${id}`,
-      {
-        method: "DELETE"
-      }
-    );
-
-    await loadProducts();
-
-  } catch (error) {
-
-    console.error(error);
-    alert("حدث خطأ أثناء حذف المنتج");
-  }
+  color: #eee;
 }
 
 
-async function deleteAllProducts() {
+/* PRODUCTS */
 
-  if (!confirm("تحذير: سيتم حذف جميع المنتجات. هل أنت متأكد؟")) {
-    return;
-  }
+.section {
 
-  try {
-
-    await supabaseRequest(
-      "products?id=not.is.null",
-      {
-        method: "DELETE"
-      }
-    );
-
-    await loadProducts();
-
-    alert("تم حذف جميع المنتجات");
-
-  } catch (error) {
-
-    console.error(error);
-    alert("حدث خطأ أثناء الحذف");
-  }
+  padding: 90px 7%;
 }
 
 
-// ================================
-// DELIVERY ADMIN
-// ================================
+.section-head {
 
-function renderAdminDelivery() {
-
-  const box =
-    document.getElementById("adminDelivery");
-
-  if (!box) return;
-
-  box.innerHTML = delivery.map(item => {
-
-    return `
-      <div class="admin-item">
-
-        <div></div>
-
-        <div class="admin-item-info">
-
-          <strong>
-            ${escapeHTML(item.name)}
-          </strong>
-
-          <small>
-            ${Number(item.price).toLocaleString()} DA
-          </small>
-
-        </div>
-
-        <div class="admin-actions">
-
-          <button onclick="editDelivery(${item.id})">
-            تعديل
-          </button>
-
-          <button onclick="deleteDelivery(${item.id})">
-            حذف
-          </button>
-
-        </div>
-
-      </div>
-    `;
-
-  }).join("");
+  text-align: center;
 }
 
 
-async function addDelivery() {
+.section-head p {
 
-  const name =
-    document.getElementById("deliveryName")?.value.trim();
+  color: #e50914;
 
-  const price =
-    Number(document.getElementById("deliveryPrice")?.value);
+  letter-spacing: 4px;
 
-  if (!name || Number.isNaN(price)) {
-    alert("اكتب الولاية والسعر");
-    return;
-  }
-
-  try {
-
-    await supabaseRequest(
-      "delivery",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          name,
-          price
-        }),
-        headers: {
-          "Prefer": "return=representation"
-        }
-      }
-    );
-
-    document.getElementById("deliveryName").value = "";
-    document.getElementById("deliveryPrice").value = "";
-
-    await loadDelivery();
-
-  } catch (error) {
-
-    console.error(error);
-    alert("حدث خطأ أثناء إضافة الولاية");
-  }
+  font-size: 12px;
 }
 
 
-async function editDelivery(id) {
+.section h2,
+.order-section h2 {
 
-  const item =
-    delivery.find(d => Number(d.id) === Number(id));
+  font-size: 34px;
 
-  if (!item) return;
-
-  const name =
-    prompt("الولاية:", item.name);
-
-  if (name === null) return;
-
-  const price =
-    prompt("سعر التوصيل:", item.price);
-
-  if (price === null) return;
-
-  try {
-
-    await supabaseRequest(
-      `delivery?id=eq.${id}`,
-      {
-        method: "PATCH",
-        body: JSON.stringify({
-          name,
-          price: Number(price)
-        })
-      }
-    );
-
-    await loadDelivery();
-
-  } catch (error) {
-
-    console.error(error);
-    alert("حدث خطأ أثناء التعديل");
-  }
+  margin: 10px 0 35px;
 }
 
 
-async function deleteDelivery(id) {
+.products-grid {
 
-  if (!confirm("حذف هذه الولاية؟")) return;
+  display: grid;
 
-  try {
+  grid-template-columns: repeat(3,1fr);
 
-    await supabaseRequest(
-      `delivery?id=eq.${id}`,
-      {
-        method: "DELETE"
-      }
-    );
-
-    await loadDelivery();
-
-  } catch (error) {
-
-    console.error(error);
-    alert("حدث خطأ أثناء الحذف");
-  }
+  gap: 22px;
 }
 
 
-// ================================
-// ADMIN ORDERS
-// ================================
+.product-card {
 
-function renderAdminOrders() {
+  background: #101010;
 
-  const box =
-    document.getElementById("adminOrders");
+  border: 1px solid #242424;
 
-  if (!box) return;
+  border-radius: 12px;
 
-  if (!orders.length) {
-
-    box.innerHTML = `
-      <div style="padding:25px;color:#777;text-align:center">
-        لا توجد طلبات
-      </div>
-    `;
-
-    return;
-  }
-
-  box.innerHTML = orders.map(order => {
-
-    const items =
-      Array.isArray(order.items)
-        ? order.items
-        : [];
-
-    return `
-      <div
-        class="admin-item"
-        style="grid-template-columns:1fr"
-      >
-
-        <div class="admin-item-info">
-
-          <strong>
-            #${order.id} — ${escapeHTML(order.customer_name || "")}
-          </strong>
-
-          <small>
-            📱 ${escapeHTML(order.phone || "")}
-            <br>
-            📍 ${escapeHTML(order.wilaya || "")}
-            <br>
-            💰 ${Number(order.total || 0).toLocaleString()} DA
-            <br>
-            📌 الحالة:
-            ${escapeHTML(order.status || "جديد")}
-          </small>
-
-          <div style="margin-top:12px">
-
-            ${items.map(item => `
-              <div style="color:#aaa;font-size:13px">
-                • ${escapeHTML(item.name)}
-                ${item.size
-                  ? " — " + escapeHTML(item.size)
-                  : ""}
-              </div>
-            `).join("")}
-
-          </div>
-
-        </div>
-
-        <div class="admin-actions">
-
-          <button onclick="changeOrderStatus(${order.id})">
-            الحالة
-          </button>
-
-          <button onclick="deleteOrder(${order.id})">
-            حذف
-          </button>
-
-        </div>
-
-      </div>
-    `;
-
-  }).join("");
+  overflow: hidden;
 }
 
 
-async function changeOrderStatus(id) {
+.product-card img {
 
-  const order =
-    orders.find(o => Number(o.id) === Number(id));
+  width: 100%;
 
-  if (!order) return;
+  height: 390px;
 
-  const status =
-    prompt(
-      "اكتب الحالة: جديد / مؤكد / قيد التوصيل / تم التسليم / ملغى",
-      order.status || "جديد"
-    );
+  object-fit: cover;
 
-  if (status === null) return;
-
-  try {
-
-    await supabaseRequest(
-      `orders?id=eq.${id}`,
-      {
-        method: "PATCH",
-        body: JSON.stringify({
-          status
-        })
-      }
-    );
-
-    await loadOrders();
-
-  } catch (error) {
-
-    console.error(error);
-    alert("حدث خطأ أثناء تغيير الحالة");
-  }
+  display: block;
 }
 
 
-async function deleteOrder(id) {
+.product-info {
 
-  if (!confirm("هل تريد حذف هذا الطلب؟")) {
-    return;
-  }
-
-  try {
-
-    await supabaseRequest(
-      `orders?id=eq.${id}`,
-      {
-        method: "DELETE"
-      }
-    );
-
-    await loadOrders();
-
-  } catch (error) {
-
-    console.error(error);
-    alert("حدث خطأ أثناء حذف الطلب");
-  }
+  padding: 18px;
 }
 
 
-// ================================
-// STATS
-// ================================
+.product-info h3 {
 
-function updateStats() {
-
-  const ordersCount =
-    orders.length;
-
-  const sales =
-    orders
-      .filter(o => o.status !== "ملغى")
-      .reduce(
-        (sum, o) => sum + Number(o.total || 0),
-        0
-      );
-
-  const statOrders =
-    document.getElementById("statOrders");
-
-  const statSales =
-    document.getElementById("statSales");
-
-  const statProfit =
-    document.getElementById("statProfit");
-
-  if (statOrders) {
-    statOrders.textContent = ordersCount;
-  }
-
-  if (statSales) {
-    statSales.textContent =
-      sales.toLocaleString() + " DA";
-  }
-
-  // الربح الحقيقي يحتاج تكلفة شراء المنتجات.
-  // حاليًا نعرض المبيعات بدل اختراع تكلفة.
-  if (statProfit) {
-    statProfit.textContent =
-      sales.toLocaleString() + " DA";
-  }
+  margin: 0 0 8px;
 }
 
 
-// ================================
-// SETTINGS
-// ================================
+.price {
 
-async function saveSettings() {
+  font-size: 22px;
 
-  const price =
-    Number(
-      document.getElementById("defaultPrice")?.value
-    );
+  font-weight: 900;
 
-  const whatsapp =
-    document.getElementById("waNumber")?.value.trim();
+  color: #e50914;
+}
 
-  try {
 
-    await upsertSetting(
-      "default_price",
-      String(price || 2600)
-    );
+.sizes {
 
-    if (whatsapp) {
+  font-size: 13px;
 
-      await upsertSetting(
-        "whatsapp",
-        whatsapp
-      );
+  color: #999;
 
-    }
+  margin: 8px 0 14px;
+}
 
-    settings.default_price =
-      price || 2600;
 
-    settings.whatsapp =
-      whatsapp || WHATSAPP;
+.add-btn {
 
-    alert("تم حفظ الإعدادات");
+  width: 100%;
 
-  } catch (error) {
+  border: 1px solid #e50914;
 
-    console.error(error);
-    alert("حدث خطأ أثناء حفظ الإعدادات");
+  background: transparent;
+
+  color: #fff;
+
+  padding: 12px;
+
+  border-radius: 6px;
+
+  cursor: pointer;
+}
+
+
+.add-btn:hover {
+
+  background: #e50914;
+}
+
+
+/* ORDER */
+
+.order-section {
+
+  background: #0b0b0b;
+
+  padding: 80px 7%;
+
+  border-top: 1px solid #1d1d1d;
+}
+
+
+.order-wrap {
+
+  max-width: 1150px;
+
+  margin: auto;
+
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 50px;
+}
+
+
+.summary,
+.order-form {
+
+  background: #101010;
+
+  border: 1px solid #252525;
+
+  border-radius: 12px;
+
+  padding: 28px;
+}
+
+
+.cart-list {
+
+  min-height: 100px;
+}
+
+
+.cart-item {
+
+  display: flex;
+
+  justify-content: space-between;
+
+  gap: 10px;
+
+  padding: 12px 0;
+
+  border-bottom: 1px solid #252525;
+}
+
+
+.cart-item button {
+
+  background: none;
+
+  border: 0;
+
+  color: #e50914;
+
+  cursor: pointer;
+}
+
+
+.line,
+.total {
+
+  display: flex;
+
+  justify-content: space-between;
+
+  padding: 13px 0;
+}
+
+
+.total {
+
+  font-size: 22px;
+
+  border-top: 1px solid #333;
+
+  margin-top: 10px;
+}
+
+
+.order-form label {
+
+  display: block;
+
+  color: #bbb;
+
+  font-size: 13px;
+
+  margin-bottom: 15px;
+}
+
+
+.order-form input,
+.order-form select,
+.login-box input {
+
+  display: block;
+
+  width: 100%;
+
+  margin-top: 7px;
+
+  background: #080808;
+
+  color: #fff;
+
+  border: 1px solid #333;
+
+  border-radius: 6px;
+
+  padding: 13px;
+
+  outline: none;
+}
+
+
+.order-form input:focus,
+.order-form select:focus,
+.login-box input:focus {
+
+  border-color: #e50914;
+}
+
+
+.full {
+
+  width: 100%;
+
+  text-align: center;
+}
+
+
+/* CONTACT */
+
+.contact {
+
+  text-align: center;
+
+  padding: 70px 20px;
+}
+
+
+.contact p {
+
+  color: #aaa;
+}
+
+
+.wa-btn {
+
+  display: inline-block;
+
+  background: #161616;
+
+  border: 1px solid #333;
+
+  padding: 13px 20px;
+
+  border-radius: 7px;
+}
+
+
+.wa-btn:hover {
+
+  border-color: #e50914;
+}
+
+
+/* FOOTER */
+
+footer {
+
+  border-top: 1px solid #222;
+
+  padding: 30px 7%;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 15px;
+
+  color: #777;
+
+  font-size: 12px;
+}
+
+
+footer img {
+
+  width: 35px;
+
+  height: 35px;
+
+  object-fit: cover;
+
+  border-radius: 50%;
+}
+
+
+footer span {
+
+  margin-right: auto;
+}
+
+
+/* LOGIN */
+
+.modal {
+
+  display: none;
+
+  position: fixed;
+
+  inset: 0;
+
+  background: rgba(0,0,0,.82);
+
+  z-index: 100;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 20px;
+}
+
+
+.modal.show {
+
+  display: flex;
+}
+
+
+.login-box {
+
+  position: relative;
+
+  width: min(400px,100%);
+
+  background: #101010;
+
+  border: 1px solid #333;
+
+  border-radius: 14px;
+
+  padding: 35px;
+
+  text-align: center;
+}
+
+
+.login-box img {
+
+  width: 70px;
+
+  height: 70px;
+
+  object-fit: cover;
+
+  border-radius: 50%;
+}
+
+
+.login-box h2 {
+
+  margin: 15px 0 5px;
+}
+
+
+.login-box p {
+
+  color: #888;
+}
+
+
+.close {
+
+  position: absolute;
+
+  right: 15px;
+
+  top: 10px;
+
+  background: none;
+
+  border: 0;
+
+  color: #aaa;
+
+  font-size: 30px;
+
+  cursor: pointer;
+}
+
+
+.login-box small {
+
+  display: block;
+
+  color: #e50914;
+
+  margin-top: 12px;
+
+  min-height: 18px;
+}
+
+
+/* ADMIN */
+
+.admin-page {
+
+  min-height: 100vh;
+}
+
+
+.admin-wrap {
+
+  max-width: 1150px;
+
+  margin: auto;
+
+  padding: 55px 20px;
+}
+
+
+.admin-wrap h1 {
+
+  font-size: 40px;
+}
+
+
+.admin-tabs {
+
+  display: flex;
+
+  gap: 8px;
+
+  flex-wrap: wrap;
+
+  margin: 25px 0;
+}
+
+
+.admin-tabs button {
+
+  background: #151515;
+
+  color: #fff;
+
+  border: 1px solid #333;
+
+  padding: 12px 18px;
+
+  border-radius: 6px;
+
+  cursor: pointer;
+}
+
+
+.admin-tabs button:hover {
+
+  border-color: #e50914;
+}
+
+
+.admin-tab {
+
+  background: #101010;
+
+  border: 1px solid #252525;
+
+  border-radius: 12px;
+
+  padding: 25px;
+}
+
+
+.hidden {
+
+  display: none;
+}
+
+
+.admin-form {
+
+  display: grid;
+
+  grid-template-columns: repeat(2,1fr);
+
+  gap: 10px;
+
+  margin-bottom: 25px;
+}
+
+
+.admin-form input {
+
+  background: #080808;
+
+  color: #fff;
+
+  border: 1px solid #333;
+
+  padding: 13px;
+
+  border-radius: 6px;
+}
+
+
+.admin-form button {
+
+  background: #e50914;
+
+  color: #fff;
+
+  border: 0;
+
+  border-radius: 6px;
+
+  padding: 13px;
+
+  cursor: pointer;
+}
+
+
+.admin-row {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 15px;
+
+  border: 1px solid #292929;
+
+  background: #0a0a0a;
+
+  padding: 12px;
+
+  margin: 10px 0;
+
+  border-radius: 8px;
+}
+
+
+.admin-row img {
+
+  width: 70px;
+
+  height: 70px;
+
+  object-fit: cover;
+
+  border-radius: 6px;
+}
+
+
+.admin-row > div {
+
+  flex: 1;
+}
+
+
+.admin-row p {
+
+  margin: 6px 0;
+
+  color: #aaa;
+}
+
+
+.admin-row select {
+
+  background: #111;
+
+  color: #fff;
+
+  border: 1px solid #333;
+
+  padding: 9px;
+
+  border-radius: 5px;
+}
+
+
+.danger {
+
+  background: #a80000 !important;
+
+  color: #fff;
+
+  border: 0;
+
+  padding: 10px 14px;
+
+  border-radius: 6px;
+
+  cursor: pointer;
+}
+
+
+.muted {
+
+  color: #888;
+}
+
+
+.loading {
+
+  text-align: center;
+
+  color: #888;
+
+  grid-column: 1 / -1;
+
+  padding: 50px;
+}
+
+
+/* MOBILE */
+
+@media(max-width:800px) {
+
+  .topbar {
+
+    padding: 0 15px;
   }
-}
 
+  .topbar nav {
 
-async function upsertSetting(key, value) {
-
-  await supabaseRequest(
-    `settings?key=eq.${encodeURIComponent(key)}`,
-    {
-      method: "PATCH",
-      body: JSON.stringify({
-        value,
-        updated_at: new Date().toISOString()
-      })
-    }
-  );
-
-  const existing =
-    await supabaseRequest(
-      `settings?key=eq.${encodeURIComponent(key)}&select=id`
-    );
-
-  if (!existing || !existing.length) {
-
-    await supabaseRequest(
-      "settings",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          key,
-          value
-        }),
-        headers: {
-          "Prefer": "return=representation"
-        }
-      }
-    );
+    display: none;
   }
-}
 
+  .hero {
 
-// ================================
-// SECURITY / HTML HELPERS
-// ================================
+    grid-template-columns: 1fr;
 
-function escapeHTML(value) {
-
-  return String(value ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
-
-function escapeAttribute(value) {
-
-  return escapeHTML(value);
-}
-
-
-// ================================
-// START
-// ================================
-
-document.addEventListener(
-  "DOMContentLoaded",
-  async () => {
-
-    try {
-
-      await loadProducts();
-      await loadDelivery();
-      await loadSettings();
-
-      renderCart();
-
-    } catch (error) {
-
-      console.error("SHADOW ERROR:", error);
-
-      console.warn(
-        "تأكد من Supabase URL و Publishable Key."
-      );
-
-    }
-
+    padding: 45px 20px;
   }
-);
+
+  .hero-images img:first-child {
+
+    height: 300px;
+  }
+
+  .hero-images img {
+
+    height: 200px;
+  }
+
+  .features {
+
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .products-grid,
+  .order-wrap {
+
+    grid-template-columns: 1fr;
+  }
+
+  .section,
+  .order-section {
+
+    padding: 60px 20px;
+  }
+
+  .product-card img {
+
+    height: 350px;
+  }
+
+  footer {
+
+    flex-wrap: wrap;
+  }
+
+  .hero h1 {
+
+    font-size: 65px;
+  }
+
+  .admin-form {
+
+    grid-template-columns: 1fr;
+  }
+
+  .admin-row {
+
+    align-items: flex-start;
+
+    flex-wrap: wrap;
+  }
+
+}
