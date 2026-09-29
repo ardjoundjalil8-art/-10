@@ -1,97 +1,75 @@
 const SUPABASE_URL =
   "https://knjdouprbwkxcuqyhpvh.supabase.co";
 
-
 const SUPABASE_KEY =
   "sb_publishable_iNdVPUDh7LRiQ27JX3smyA_C345zSB_";
-
 
 const ADMIN_PASSWORD =
   "2412822010";
 
 
 if (
-  sessionStorage.getItem(
-    "shadow_admin"
-  ) !== "1"
+  sessionStorage.getItem("shadow_admin") !== "1"
 ) {
-
-  location.href =
-    "index.html";
-
+  location.href = "index.html";
 }
 
 
-async function api(
-  path,
-  options = {}
-) {
+async function api(path, options = {}) {
 
-  const response =
-    await fetch(
-      SUPABASE_URL +
-      "/rest/v1/" +
-      path,
-      {
+  const response = await fetch(
+    SUPABASE_URL + "/rest/v1/" + path,
+    {
+      ...options,
 
-        ...options,
+      headers: {
+        apikey: SUPABASE_KEY,
 
-        headers: {
+        Authorization:
+          "Bearer " + SUPABASE_KEY,
 
-          apikey:
-            SUPABASE_KEY,
+        "Content-Type":
+          "application/json",
 
-          Authorization:
-            "Bearer " +
-            SUPABASE_KEY,
-
-          "Content-Type":
-            "application/json",
-
-          ...(options.headers || {})
-
-        }
-
+        ...(options.headers || {})
       }
-    );
+    }
+  );
 
 
   if (!response.ok) {
-
     throw new Error(
       await response.text()
     );
-
   }
 
 
-  const text =
-    await response.text();
-
+  const text = await response.text();
 
   return text
     ? JSON.parse(text)
     : [];
-
 }
 
+
+/* =========================
+   REFRESH
+========================= */
 
 async function refresh() {
 
   try {
 
-    const products =
-      await api(
-        "products?select=*&order=id.desc"
-      );
+    const products = await api(
+      "products?select=*&order=id.desc"
+    );
 
 
     document.getElementById(
       "productsList"
-    ).innerHTML =
+    ).innerHTML = products.length
 
-      products.map(
-        product => `
+      ? products.map(product => `
 
         <div class="admin-row">
 
@@ -107,14 +85,44 @@ async function refresh() {
             </b>
 
             <p>
-              ${product.price} DA
+              ${Number(product.price || 0).toLocaleString("fr-DZ")}
+              DA
+
               —
-              ${escapeHTML(
-                product.sizes || ""
-              )}
+
+              ${escapeHTML(product.sizes || "")}
+            </p>
+
+            <p>
+              ${
+                product.is_hidden
+                  ? "🔴 المنتج مخفي"
+                  : "🟢 المنتج ظاهر"
+              }
             </p>
 
           </div>
+
+
+          <button
+            class="admin-btn"
+            onclick="editProduct(${product.id})"
+          >
+            ✏️ تعديل
+          </button>
+
+
+          <button
+            class="admin-btn"
+            onclick="toggleProduct(${product.id}, ${product.is_hidden ? "true" : "false"})"
+          >
+            ${
+              product.is_hidden
+                ? "👁️ إظهار"
+                : "🙈 إخفاء"
+            }
+          </button>
+
 
           <button
             class="danger"
@@ -125,271 +133,279 @@ async function refresh() {
 
         </div>
 
-      `
-      ).join("");
+      `).join("")
+
+      : "<p class='muted'>لا توجد منتجات.</p>";
 
 
-    const delivery =
-      await api(
-        "delivery?select=*&order=id.asc"
-      );
+    /* DELIVERY */
+
+    const delivery = await api(
+      "delivery?select=*&order=id.asc"
+    );
 
 
     document.getElementById(
       "deliveryList"
-    ).innerHTML =
+    ).innerHTML = delivery.map(item => `
 
-      delivery.map(
-        item => `
+      <div class="admin-row">
 
-        <div class="admin-row">
+        <div>
 
-          <div>
+          <b>
+            ${escapeHTML(item.name)}
+          </b>
 
-            <b>
-              ${escapeHTML(item.name)}
-            </b>
+          <p>
 
-            <p>
+            Domicile:
+            ${Number(item.price || 0).toLocaleString("fr-DZ")}
+            DA
 
-              Domicile:
-              ${item.price} DA
+            —
 
-              —
+            Stop desk:
+            ${Number(item.stop_price || 0).toLocaleString("fr-DZ")}
+            DA
 
-              Stop desk:
-              ${item.stop_price ?? 0} DA
-
-            </p>
-
-          </div>
-
-          <button
-            class="danger"
-            onclick="delDelivery(${item.id})"
-          >
-            حذف
-          </button>
+          </p>
 
         </div>
 
-      `
-      ).join("");
+
+        <button
+          class="danger"
+          onclick="delDelivery(${item.id})"
+        >
+          حذف
+        </button>
+
+      </div>
+
+    `).join("");
 
 
-    const orders =
-      await api(
-        "orders?select=*&order=id.desc"
-      );
+    /* ORDERS */
+
+    const orders = await api(
+      "orders?select=*&order=id.desc"
+    );
 
 
     document.getElementById(
       "ordersList"
-    ).innerHTML =
+    ).innerHTML = orders.length
 
-      orders.length
+      ? orders.map(order => {
 
-        ? orders.map(
-            order => {
+          let items = [];
 
-              let items = [];
+          try {
 
-              try {
+            items =
+              Array.isArray(order.items)
+                ? order.items
+                : JSON.parse(
+                    order.items || "[]"
+                  );
 
-                items =
-                  Array.isArray(order.items)
-                    ? order.items
-                    : JSON.parse(
-                        order.items || "[]"
-                      );
+          } catch {
 
-              }
+            items = [];
 
-              catch {
-
-                items = [];
-
-              }
+          }
 
 
-              return `
+          return `
 
-              <div class="admin-row order-admin-row">
+          <div class="admin-row order-admin-row">
 
-                <div class="order-content">
+            <div class="order-content">
 
-                  <b>
-                    ${escapeHTML(
-                      order.customer_name || ""
-                    )}
-                  </b>
+              <b>
+                ${escapeHTML(
+                  order.customer_name || ""
+                )}
+              </b>
 
-                  <p>
+              <p>
 
-                    ${escapeHTML(
-                      order.phone || ""
-                    )}
+                ${escapeHTML(
+                  order.phone || ""
+                )}
 
-                    —
+                —
 
-                    ${escapeHTML(
-                      order.wilaya || ""
-                    )}
+                ${escapeHTML(
+                  order.wilaya || ""
+                )}
 
-                    —
+                —
 
-                    ${order.total || 0} DA
+                ${Number(
+                  order.total || 0
+                ).toLocaleString("fr-DZ")}
+                DA
 
-                  </p>
-
-                  <small>
-
-                    ${escapeHTML(
-                      order.address || ""
-                    )}
-
-                  </small>
+              </p>
 
 
-                  <div class="order-products">
+              <small>
 
-                    ${
-                      items.length
+                ${escapeHTML(
+                  order.address || ""
+                )}
 
-                        ? items.map(
-                            item => {
-
-                              const product =
-                                products.find(
-                                  p =>
-                                    String(p.id) ===
-                                    String(item.id)
-                                );
+              </small>
 
 
-                              const image =
-                                item.image ||
-                                product?.image ||
-                                "";
+              <div class="order-products">
+
+                ${
+                  items.length
+
+                    ? items.map(item => {
+
+                        const product =
+                          products.find(
+                            p =>
+                              String(p.id) ===
+                              String(item.id)
+                          );
 
 
-                              return `
+                        const image =
+                          item.image ||
+                          product?.image ||
+                          "";
 
-                              <div class="order-product">
 
-                                ${
-                                  image
-                                    ? `
-                                    <img
-                                      src="${escapeHTML(image)}"
-                                      alt=""
-                                    >
-                                    `
-                                    : `
-                                    <div class="no-product-image">
-                                      لا صورة
-                                    </div>
-                                    `
-                                }
+                        return `
 
-                                <div>
+                        <div class="order-product">
 
-                                  <strong>
-                                    ${escapeHTML(
-                                      item.name || ""
-                                    )}
-                                  </strong>
+                          ${
+                            image
 
-                                  <span>
-                                    ${Number(
-                                      item.price || 0
-                                    ).toLocaleString("fr-DZ")}
-                                    DA
-                                  </span>
+                              ? `
 
+                                <img
+                                  src="${escapeHTML(image)}"
+                                  alt=""
+                                >
+
+                              `
+
+                              : `
+
+                                <div class="no-product-image">
+                                  لا صورة
                                 </div>
 
-                              </div>
-
-                              `;
-
-                            }
-                          ).join("")
-
-                        : `
-                          <small class="muted">
-                            لا توجد معلومات المنتجات
-                          </small>
-                          `
-                    }
-
-                  </div>
-
-                </div>
+                              `
+                          }
 
 
-                <select
-                  onchange="statusOrder(
-                    ${order.id},
-                    this.value
-                  )"
-                >
+                          <div>
 
-                  <option
-                    ${
-                      order.status === "جديد"
-                        ? "selected"
-                        : ""
-                    }
-                  >
-                    جديد
-                  </option>
+                            <strong>
+                              ${escapeHTML(
+                                item.name || ""
+                              )}
+                            </strong>
 
-                  <option
-                    ${
-                      order.status === "مؤكد"
-                        ? "selected"
-                        : ""
-                    }
-                  >
-                    مؤكد
-                  </option>
+                            <span>
 
-                  <option
-                    ${
-                      order.status === "تم التوصيل"
-                        ? "selected"
-                        : ""
-                    }
-                  >
-                    تم التوصيل
-                  </option>
+                              ${Number(
+                                item.price || 0
+                              ).toLocaleString("fr-DZ")}
 
-                  <option
-                    ${
-                      order.status === "ملغى"
-                        ? "selected"
-                        : ""
-                    }
-                  >
-                    ملغى
-                  </option>
+                              DA
 
-                </select>
+                            </span>
+
+                          </div>
+
+                        </div>
+
+                        `;
+
+                      }).join("")
+
+                    : `
+
+                      <small class="muted">
+                        لا توجد معلومات المنتجات
+                      </small>
+
+                    `
+                }
 
               </div>
 
-              `;
-
-            }
-          ).join("")
-
-        : "<p class='muted'>لا توجد طلبات.</p>";
+            </div>
 
 
-  }
+            <select
+              onchange="statusOrder(
+                ${order.id},
+                this.value
+              )"
+            >
 
-  catch (error) {
+              <option
+                ${
+                  order.status === "جديد"
+                    ? "selected"
+                    : ""
+                }
+              >
+                جديد
+              </option>
+
+              <option
+                ${
+                  order.status === "مؤكد"
+                    ? "selected"
+                    : ""
+                }
+              >
+                مؤكد
+              </option>
+
+              <option
+                ${
+                  order.status === "تم التوصيل"
+                    ? "selected"
+                    : ""
+                }
+              >
+                تم التوصيل
+              </option>
+
+              <option
+                ${
+                  order.status === "ملغى"
+                    ? "selected"
+                    : ""
+                }
+              >
+                ملغى
+              </option>
+
+            </select>
+
+          </div>
+
+          `;
+
+        }).join("")
+
+      : "<p class='muted'>لا توجد طلبات.</p>";
+
+
+  } catch (error) {
 
     console.error(error);
 
@@ -402,26 +418,29 @@ async function refresh() {
 }
 
 
+/* =========================
+   TABS
+========================= */
+
 function showTab(id) {
 
   document
     .querySelectorAll(".admin-tab")
-    .forEach(
-      section =>
-        section.classList.add(
-          "hidden"
-        )
+    .forEach(section =>
+      section.classList.add("hidden")
     );
 
 
   document
     .getElementById(id)
-    .classList.remove(
-      "hidden"
-    );
+    .classList.remove("hidden");
 
 }
 
+
+/* =========================
+   ADD PRODUCT
+========================= */
 
 async function addProduct() {
 
@@ -465,7 +484,6 @@ async function addProduct() {
   await api(
     "products",
     {
-
       method: "POST",
 
       body: JSON.stringify({
@@ -479,7 +497,9 @@ async function addProduct() {
         sizes: sizes,
 
         description:
-          "Hoodie Shadow"
+          "Hoodie Shadow",
+
+        is_hidden: false
 
       })
 
@@ -501,6 +521,153 @@ async function addProduct() {
 
 }
 
+
+/* =========================
+   EDIT PRODUCT
+========================= */
+
+async function editProduct(id) {
+
+  const products = await api(
+    "products?id=eq." + id + "&select=*"
+  );
+
+
+  if (!products.length) {
+
+    alert(
+      "المنتج غير موجود"
+    );
+
+    return;
+
+  }
+
+
+  const product = products[0];
+
+
+  const name = prompt(
+    "اسم المنتج:",
+    product.name || ""
+  );
+
+
+  if (name === null) {
+    return;
+  }
+
+
+  const priceText = prompt(
+    "السعر:",
+    product.price || 0
+  );
+
+
+  if (priceText === null) {
+    return;
+  }
+
+
+  const image = prompt(
+    "رابط الصورة:",
+    product.image || ""
+  );
+
+
+  if (image === null) {
+    return;
+  }
+
+
+  const sizes = prompt(
+    "المقاسات مثال: S,M,L,XL",
+    product.sizes || ""
+  );
+
+
+  if (sizes === null) {
+    return;
+  }
+
+
+  await api(
+    "products?id=eq." + id,
+    {
+      method: "PATCH",
+
+      body: JSON.stringify({
+
+        name: name.trim(),
+
+        price: Number(
+          priceText || 0
+        ),
+
+        image: image.trim(),
+
+        sizes: sizes.trim()
+
+      })
+
+    }
+  );
+
+
+  await refresh();
+
+
+  alert(
+    "تم تعديل المنتج بنجاح ✅"
+  );
+
+}
+
+
+/* =========================
+   HIDE / SHOW PRODUCT
+========================= */
+
+async function toggleProduct(
+  id,
+  currentlyHidden
+) {
+
+  const newHidden =
+    !currentlyHidden;
+
+
+  await api(
+    "products?id=eq." + id,
+    {
+      method: "PATCH",
+
+      body: JSON.stringify({
+
+        is_hidden:
+          newHidden
+
+      })
+
+    }
+  );
+
+
+  await refresh();
+
+
+  alert(
+    newHidden
+      ? "تم إخفاء المنتج 👁️"
+      : "تم إظهار المنتج 👁️"
+  );
+
+}
+
+
+/* =========================
+   DELETE PRODUCT
+========================= */
 
 async function delProduct(id) {
 
@@ -527,6 +694,10 @@ async function delProduct(id) {
 
 }
 
+
+/* =========================
+   DELIVERY
+========================= */
 
 async function addDelivery() {
 
@@ -566,7 +737,6 @@ async function addDelivery() {
   await api(
     "delivery",
     {
-
       method: "POST",
 
       body: JSON.stringify({
@@ -630,6 +800,10 @@ async function delDelivery(id) {
 }
 
 
+/* =========================
+   ORDER STATUS
+========================= */
+
 async function statusOrder(
   id,
   status
@@ -638,7 +812,6 @@ async function statusOrder(
   await api(
     "orders?id=eq." + id,
     {
-
       method: "PATCH",
 
       body: JSON.stringify({
@@ -651,6 +824,10 @@ async function statusOrder(
 }
 
 
+/* =========================
+   SETTINGS
+========================= */
+
 function saveSettings() {
 
   alert(
@@ -659,6 +836,10 @@ function saveSettings() {
 
 }
 
+
+/* =========================
+   DELETE ALL PRODUCTS
+========================= */
 
 async function deleteAllProducts() {
 
@@ -685,6 +866,10 @@ async function deleteAllProducts() {
 
 }
 
+
+/* =========================
+   ESCAPE HTML
+========================= */
 
 function escapeHTML(value) {
 
