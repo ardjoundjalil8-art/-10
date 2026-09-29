@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Hoodie Shadow</title>
+
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -12,26 +15,45 @@
 <header class="topbar">
 
   <a class="brand" href="#home">
-    <img src="https://i.postimg.cc/FH3mwcKj/1F620D3C-AE36-4FE0-849D-08DFCEDDB4B2.jpg" alt="SHADOW">
+
+    <img
+      src="https://i.postimg.cc/FH3mwcKj/1F620D3C-AE36-4FE0-849D-08DFCEDDB4B2.jpg"
+      alt="SHADOW"
+    >
+
     <span>SHADOW</span>
+
   </a>
 
-  <nav>
-    <a href="#home">الرئيسية</a>
-    <a href="#products">المنتجات</a>
-    <a href="#order">اطلب الآن</a>
 
-    <button class="admin-btn" onclick="openAdminLogin()">
-      إدارة
-    </button>
+  <nav>
+
+    <a href="#home">
+      الرئيسية
+    </a>
+
+    <a href="#products">
+      المنتجات
+    </a>
+
+    <a href="#order">
+      اطلب الآن
+    </a>
+
   </nav>
 
-  <button class="cart-btn" onclick="scrollToOrder()">
+
+  <button
+    class="cart-btn"
+    onclick="scrollToOrder()"
+  >
     🛒 <span id="cartCount">0</span>
   </button>
 
 </header>
 
+
+<!-- HERO -->
 
 <section id="home" class="hero">
 
@@ -50,7 +72,10 @@
       Le style qui te suit partout.
     </p>
 
-    <a class="main-btn" href="#products">
+    <a
+      class="main-btn"
+      href="#products"
+    >
       DÉCOUVRIR
     </a>
 
@@ -59,41 +84,70 @@
 
   <div class="hero-images">
 
-    <img src="https://i.postimg.cc/13wPb6zH/4ADBA7A9-68C2-4452-ACA3-4FD44F2F085C.jpg">
+    <img
+      src="https://i.postimg.cc/13wPb6zH/4ADBA7A9-68C2-4452-ACA3-4FD44F2F085C.jpg"
+      alt="Hoodie Shadow"
+    >
 
-    <img src="https://i.postimg.cc/YCYkTgSX/6056F7AE-2271-4941-9F4B-1B779F29B795.jpg">
+    <img
+      src="https://i.postimg.cc/YCYkTgSX/6056F7AE-2271-4941-9F4B-1B779F29B795.jpg"
+      alt="Hoodie Shadow"
+    >
 
-    <img src="https://i.postimg.cc/htTgNxG1/6254ECBD-FB1B-4B36-A209-F7149C1A9AA7.jpg">
+    <img
+      src="https://i.postimg.cc/htTgNxG1/6254ECBD-FB1B-4B36-A209-F7149C1A9AA7.jpg"
+      alt="Hoodie Shadow"
+    >
 
   </div>
 
 </section>
 
 
+<!-- FEATURES -->
+
 <section class="features">
 
-  <div>✓ <b>Qualité garantie</b></div>
+  <div>
+    ✓ <b>Qualité garantie</b>
+  </div>
 
-  <div>🚚 <b>Livraison rapide</b></div>
+  <div>
+    🚚 <b>Livraison rapide</b>
+  </div>
 
-  <div>🔒 <b>Paiement à la livraison</b></div>
+  <div>
+    🔒 <b>Paiement à la livraison</b>
+  </div>
 
-  <div>★ <b>Style unique</b></div>
+  <div>
+    ★ <b>Style unique</b>
+  </div>
 
 </section>
 
+
+<!-- PRODUCTS -->
 
 <section id="products" class="section">
 
   <div class="section-head">
 
-    <p>HOODIE - SHADOW</p>
+    <p>
+      HOODIE - SHADOW
+    </p>
 
-    <h2>NOS PRODUITS</h2>
+    <h2>
+      NOS PRODUITS
+    </h2>
 
   </div>
 
-  <div id="productGrid" class="products-grid">
+
+  <div
+    id="productGrid"
+    class="products-grid"
+  >
 
     <div class="loading">
       Chargement...
@@ -104,10 +158,17 @@
 </section>
 
 
-<section id="order" class="order-section">
+<!-- ORDER -->
+
+<section
+  id="order"
+  class="order-section"
+>
 
   <div class="order-wrap">
 
+
+    <!-- SUMMARY -->
 
     <div class="summary">
 
@@ -119,13 +180,17 @@
         Récapitulatif
       </h2>
 
-      <div id="cartList" class="cart-list">
+      <div
+        id="cartList"
+        class="cart-list"
+      >
 
         <p>
           Votre panier est vide.
         </p>
 
       </div>
+
 
       <div class="line">
 
@@ -139,6 +204,7 @@
 
       </div>
 
+
       <div class="line">
 
         <span>
@@ -150,6 +216,7 @@
         </b>
 
       </div>
+
 
       <div class="total">
 
@@ -166,7 +233,12 @@
     </div>
 
 
-    <form class="order-form" onsubmit="sendOrder(event)">
+    <!-- ORDER FORM -->
+
+    <form
+      class="order-form"
+      onsubmit="sendOrder(event)"
+    >
 
       <p class="eyebrow">
         FINALISER LA COMMANDE
@@ -277,6 +349,8 @@
 </section>
 
 
+<!-- CONTACT -->
+
 <section class="contact">
 
   <h2>
@@ -287,6 +361,9 @@
     Commandez directement sur WhatsApp.
   </p>
 
+
+  <!-- WHATSAPP -->
+
   <a
     class="wa-btn"
     href="https://wa.me/213696380625"
@@ -295,8 +372,20 @@
     COMMANDER SUR WhatsApp 069 638 06 25
   </a>
 
+
+  <!-- ADMIN -->
+
+  <button
+    class="admin-btn"
+    onclick="openAdminLogin()"
+  >
+    🔒 إدارة الموقع
+  </button>
+
 </section>
 
+
+<!-- FOOTER -->
 
 <footer>
 
@@ -318,7 +407,10 @@
 
 <!-- ADMIN LOGIN -->
 
-<div id="loginModal" class="modal">
+<div
+  id="loginModal"
+  class="modal"
+>
 
   <div class="login-box">
 
@@ -329,18 +421,22 @@
       ×
     </button>
 
+
     <img
       src="https://i.postimg.cc/FH3mwcKj/1F620D3C-AE36-4FE0-849D-08DFCEDDB4B2.jpg"
       alt="Shadow"
     >
 
+
     <h2>
       إدارة الموقع
     </h2>
 
+
     <p>
       أدخل كلمة المرور للمتابعة
     </p>
+
 
     <input
       id="adminPassword"
@@ -349,12 +445,14 @@
       autocomplete="off"
     >
 
+
     <button
       class="main-btn full"
       onclick="loginAdmin()"
     >
       دخول
     </button>
+
 
     <small id="loginError"></small>
 
