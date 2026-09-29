@@ -3,7 +3,7 @@ const SUPABASE_URL =
 
 
 const SUPABASE_KEY =
-  "PUT_YOUR_PUBLISHABLE_KEY_HERE";
+  "sb_publishable_iNdVPUDh7LRiQ27JX3smyA_C345zSB_";
 
 
 const ADMIN_PASSWORD =
