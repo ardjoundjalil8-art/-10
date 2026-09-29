@@ -1,1037 +1,695 @@
-* {
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  margin: 0;
-  background: #070707;
-  color: #f5f5f5;
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-a {
-  text-decoration: none;
-  color: inherit;
-}
-
-button,
-input,
-select {
-  font: inherit;
-}
-
-
-/* HEADER */
-
-.topbar {
-
-  height: 76px;
-
-  position: sticky;
-  top: 0;
-
-  z-index: 20;
-
-  background: rgba(5,5,5,.94);
-
-  backdrop-filter: blur(12px);
-
-  border-bottom: 1px solid #202020;
-
-  display: flex;
-
-  align-items: center;
-
-  padding: 0 5%;
-
-  gap: 25px;
-}
-
-
-.brand {
-
-  display: flex;
-
-  align-items: center;
-
-  gap: 10px;
-
-  font-weight: 900;
-
-  letter-spacing: 2px;
-
-  font-size: 20px;
-}
-
-
-.brand img {
-
-  width: 43px;
-
-  height: 43px;
-
-  object-fit: cover;
-
-  border-radius: 50%;
-}
-
-
-.topbar nav {
-
-  display: flex;
-
-  gap: 22px;
-
-  align-items: center;
-
-  margin-right: auto;
-}
-
-
-.topbar nav a {
-
-  color: #bbb;
-
-  font-size: 14px;
-}
-
-
-.topbar nav a:hover {
-
-  color: #fff;
-}
-
-
-.admin-btn {
-
-  background: none;
-
-  border: 1px solid #333;
-
-  color: #ddd;
-
-  padding: 8px 14px;
-
-  border-radius: 7px;
-
-  cursor: pointer;
-}
-
-
-.cart-btn {
-
-  background: #e50914;
-
-  color: #fff;
-
-  border: 0;
-
-  border-radius: 8px;
-
-  padding: 9px 14px;
-
-  cursor: pointer;
-}
-
-
-/* HERO */
-
-.hero {
-
-  min-height: 650px;
-
-  padding: 70px 7%;
-
-  display: grid;
-
-  grid-template-columns: 1fr 1.1fr;
-
-  align-items: center;
-
-  gap: 50px;
-
-  direction: ltr;
-}
-
-
-.hero-copy {
-
-  direction: rtl;
-}
-
-
-.eyebrow {
-
-  font-size: 12px;
-
-  letter-spacing: 3px;
-
-  color: #aaa;
-
-  margin: 0 0 14px;
-}
-
-
-.hero h1 {
-
-  font-size: clamp(55px, 8vw, 105px);
-
-  line-height: .86;
-
-  margin: 0;
-
-  font-weight: 950;
-
-  letter-spacing: -5px;
-}
-
-
-.hero h1 span {
-
-  color: #e50914;
-}
-
-
-.hero-copy > p:not(.eyebrow) {
-
-  color: #aaa;
-
-  font-size: 18px;
-}
-
-
-.main-btn {
-
-  display: inline-block;
-
-  margin-top: 20px;
-
-  background: #e50914;
-
-  color: #fff;
-
-  border: 0;
-
-  padding: 14px 25px;
-
-  border-radius: 5px;
-
-  font-weight: 800;
-
-  cursor: pointer;
-}
-
-
-.main-btn:hover {
-
-  background: #c70710;
-}
-
-
-/* HERO IMAGES */
-
-.hero-images {
-
-  display: grid;
-
-  grid-template-columns: 1fr 1fr;
-
-  gap: 12px;
-}
-
-
-.hero-images img {
-
-  width: 100%;
-
-  height: 270px;
-
-  object-fit: cover;
-
-  border-radius: 12px;
-
-  filter: brightness(.82);
-
-  border: 1px solid #252525;
-}
-
-
-.hero-images img:first-child {
-
-  height: 420px;
-
-  grid-row: span 2;
-}
-
-
-/* FEATURES */
-
-.features {
-
-  display: grid;
-
-  grid-template-columns: repeat(4,1fr);
-
-  gap: 1px;
-
-  background: #222;
-
-  border-top: 1px solid #222;
-
-  border-bottom: 1px solid #222;
-}
-
-
-.features div {
-
-  background: #0b0b0b;
-
-  padding: 25px;
-
-  text-align: center;
-
-  color: #aaa;
-}
-
-
-.features b {
-
-  color: #eee;
-}
-
-
-/* PRODUCTS */
-
-.section {
-
-  padding: 90px 7%;
-}
-
-
-.section-head {
-
-  text-align: center;
-}
-
-
-.section-head p {
-
-  color: #e50914;
-
-  letter-spacing: 4px;
-
-  font-size: 12px;
-}
-
-
-.section h2,
-.order-section h2 {
-
-  font-size: 34px;
-
-  margin: 10px 0 35px;
-}
-
-
-.products-grid {
-
-  display: grid;
-
-  grid-template-columns: repeat(3,1fr);
-
-  gap: 22px;
-}
-
-
-.product-card {
-
-  background: #101010;
-
-  border: 1px solid #242424;
-
-  border-radius: 12px;
-
-  overflow: hidden;
-}
-
-
-.product-card img {
-
-  width: 100%;
-
-  height: 390px;
-
-  object-fit: cover;
-
-  display: block;
-}
-
-
-.product-info {
-
-  padding: 18px;
-}
-
-
-.product-info h3 {
-
-  margin: 0 0 8px;
-}
-
-
-.price {
-
-  font-size: 22px;
-
-  font-weight: 900;
-
-  color: #e50914;
-}
-
-
-.sizes {
-
-  font-size: 13px;
-
-  color: #999;
-
-  margin: 8px 0 14px;
-}
-
-
-.add-btn {
-
-  width: 100%;
-
-  border: 1px solid #e50914;
-
-  background: transparent;
-
-  color: #fff;
-
-  padding: 12px;
-
-  border-radius: 6px;
-
-  cursor: pointer;
-}
-
-
-.add-btn:hover {
-
-  background: #e50914;
-}
-
-
-/* ORDER */
-
-.order-section {
-
-  background: #0b0b0b;
-
-  padding: 80px 7%;
-
-  border-top: 1px solid #1d1d1d;
-}
-
-
-.order-wrap {
-
-  max-width: 1150px;
-
-  margin: auto;
-
-  display: grid;
-
-  grid-template-columns: 1fr 1fr;
-
-  gap: 50px;
-}
-
-
-.summary,
-.order-form {
-
-  background: #101010;
-
-  border: 1px solid #252525;
-
-  border-radius: 12px;
-
-  padding: 28px;
-}
-
-
-.cart-list {
-
-  min-height: 100px;
-}
-
-
-.cart-item {
-
-  display: flex;
-
-  justify-content: space-between;
-
-  gap: 10px;
-
-  padding: 12px 0;
-
-  border-bottom: 1px solid #252525;
-}
-
-
-.cart-item button {
-
-  background: none;
-
-  border: 0;
-
-  color: #e50914;
-
-  cursor: pointer;
-}
-
-
-.line,
-.total {
-
-  display: flex;
-
-  justify-content: space-between;
-
-  padding: 13px 0;
-}
-
-
-.total {
-
-  font-size: 22px;
-
-  border-top: 1px solid #333;
-
-  margin-top: 10px;
-}
-
-
-.order-form label {
-
-  display: block;
-
-  color: #bbb;
-
-  font-size: 13px;
-
-  margin-bottom: 15px;
-}
-
-
-.order-form input,
-.order-form select,
-.login-box input {
-
-  display: block;
-
-  width: 100%;
-
-  margin-top: 7px;
-
-  background: #080808;
-
-  color: #fff;
-
-  border: 1px solid #333;
-
-  border-radius: 6px;
-
-  padding: 13px;
-
-  outline: none;
-}
-
-
-.order-form input:focus,
-.order-form select:focus,
-.login-box input:focus {
-
-  border-color: #e50914;
-}
-
-
-.full {
-
-  width: 100%;
-
-  text-align: center;
-}
-
-
-/* CONTACT */
-
-.contact {
-
-  text-align: center;
-
-  padding: 70px 20px;
-}
-
-
-.contact p {
-
-  color: #aaa;
-}
-
-
-.wa-btn {
-
-  display: inline-block;
-
-  background: #161616;
-
-  border: 1px solid #333;
-
-  padding: 13px 20px;
-
-  border-radius: 7px;
-}
-
-
-.wa-btn:hover {
-
-  border-color: #e50914;
-}
-
-
-/* FOOTER */
-
-footer {
-
-  border-top: 1px solid #222;
-
-  padding: 30px 7%;
-
-  display: flex;
-
-  align-items: center;
-
-  gap: 15px;
-
-  color: #777;
-
-  font-size: 12px;
-}
-
-
-footer img {
-
-  width: 35px;
-
-  height: 35px;
-
-  object-fit: cover;
-
-  border-radius: 50%;
-}
-
-
-footer span {
-
-  margin-right: auto;
-}
-
-
-/* LOGIN */
-
-.modal {
-
-  display: none;
-
-  position: fixed;
-
-  inset: 0;
-
-  background: rgba(0,0,0,.82);
-
-  z-index: 100;
-
-  align-items: center;
-
-  justify-content: center;
-
-  padding: 20px;
-}
-
-
-.modal.show {
-
-  display: flex;
-}
-
-
-.login-box {
-
-  position: relative;
-
-  width: min(400px,100%);
-
-  background: #101010;
-
-  border: 1px solid #333;
-
-  border-radius: 14px;
-
-  padding: 35px;
-
-  text-align: center;
-}
-
-
-.login-box img {
-
-  width: 70px;
-
-  height: 70px;
-
-  object-fit: cover;
-
-  border-radius: 50%;
-}
-
-
-.login-box h2 {
-
-  margin: 15px 0 5px;
-}
-
-
-.login-box p {
-
-  color: #888;
-}
-
-
-.close {
-
-  position: absolute;
-
-  right: 15px;
-
-  top: 10px;
-
-  background: none;
-
-  border: 0;
-
-  color: #aaa;
-
-  font-size: 30px;
-
-  cursor: pointer;
-}
-
-
-.login-box small {
-
-  display: block;
-
-  color: #e50914;
-
-  margin-top: 12px;
-
-  min-height: 18px;
-}
-
-
-/* ADMIN */
-
-.admin-page {
-
-  min-height: 100vh;
-}
-
-
-.admin-wrap {
-
-  max-width: 1150px;
-
-  margin: auto;
-
-  padding: 55px 20px;
-}
-
-
-.admin-wrap h1 {
-
-  font-size: 40px;
-}
-
-
-.admin-tabs {
-
-  display: flex;
-
-  gap: 8px;
-
-  flex-wrap: wrap;
-
-  margin: 25px 0;
-}
-
-
-.admin-tabs button {
-
-  background: #151515;
-
-  color: #fff;
-
-  border: 1px solid #333;
-
-  padding: 12px 18px;
-
-  border-radius: 6px;
-
-  cursor: pointer;
-}
-
-
-.admin-tabs button:hover {
-
-  border-color: #e50914;
-}
-
-
-.admin-tab {
-
-  background: #101010;
-
-  border: 1px solid #252525;
-
-  border-radius: 12px;
-
-  padding: 25px;
-}
-
-
-.hidden {
-
-  display: none;
-}
-
-
-.admin-form {
-
-  display: grid;
-
-  grid-template-columns: repeat(2,1fr);
-
-  gap: 10px;
-
-  margin-bottom: 25px;
-}
-
-
-.admin-form input {
-
-  background: #080808;
-
-  color: #fff;
-
-  border: 1px solid #333;
-
-  padding: 13px;
-
-  border-radius: 6px;
-}
-
-
-.admin-form button {
-
-  background: #e50914;
-
-  color: #fff;
-
-  border: 0;
-
-  border-radius: 6px;
-
-  padding: 13px;
-
-  cursor: pointer;
-}
-
-
-.admin-row {
-
-  display: flex;
-
-  align-items: center;
-
-  gap: 15px;
-
-  border: 1px solid #292929;
-
-  background: #0a0a0a;
-
-  padding: 12px;
-
-  margin: 10px 0;
-
-  border-radius: 8px;
-}
-
-
-.admin-row img {
-
-  width: 70px;
-
-  height: 70px;
-
-  object-fit: cover;
-
-  border-radius: 6px;
-}
-
-
-.admin-row > div {
-
-  flex: 1;
-}
-
-
-.admin-row p {
-
-  margin: 6px 0;
-
-  color: #aaa;
-}
-
-
-.admin-row select {
-
-  background: #111;
-
-  color: #fff;
-
-  border: 1px solid #333;
-
-  padding: 9px;
-
-  border-radius: 5px;
-}
-
-
-.danger {
-
-  background: #a80000 !important;
-
-  color: #fff;
-
-  border: 0;
-
-  padding: 10px 14px;
-
-  border-radius: 6px;
-
-  cursor: pointer;
-}
-
-
-.muted {
-
-  color: #888;
-}
-
-
-.loading {
-
-  text-align: center;
-
-  color: #888;
-
-  grid-column: 1 / -1;
-
-  padding: 50px;
-}
-
-
-/* MOBILE */
-
-@media(max-width:800px) {
-
-  .topbar {
-
-    padding: 0 15px;
+const SUPABASE_URL =
+  "https://knjdouprbwkxcuqyhpvh.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_iNdVPUDh7LRiQ27JX3smyA_C345zSB_";
+
+const ADMIN_PASSWORD =
+  "2412822010";
+
+const WHATSAPP =
+  "213696380625";
+
+
+const INITIAL_PRODUCTS = [
+
+  {
+    name: "Hoodie Shadow 1",
+    price: 2600,
+    image: "https://i.postimg.cc/13wPb6zH/4ADBA7A9-68C2-4452-ACA3-4FD44F2F085C.jpg",
+    sizes: "S,M,L,XL",
+    description: "Hoodie Shadow"
+  },
+
+  {
+    name: "Hoodie Shadow 2",
+    price: 2600,
+    image: "https://i.postimg.cc/YCYkTgSX/6056F7AE-2271-4941-9F4B-1B779F29B795.jpg",
+    sizes: "S,M,L,XL",
+    description: "Hoodie Shadow"
+  },
+
+  {
+    name: "Hoodie Shadow 3",
+    price: 2600,
+    image: "https://i.postimg.cc/htTgNxG1/6254ECBD-FB1B-4B36-A209-F7149C1A9AA7.jpg",
+    sizes: "S,M,L,XL",
+    description: "Hoodie Shadow"
+  },
+
+  {
+    name: "Hoodie Shadow 4",
+    price: 2600,
+    image: "https://i.postimg.cc/t4Wy8Pgz/A13B2B7D-7ECA-4E82-A3FD-5B6D3DAD5712.jpg",
+    sizes: "S,M,L,XL",
+    description: "Hoodie Shadow"
+  },
+
+  {
+    name: "Hoodie Shadow 5",
+    price: 2600,
+    image: "https://i.postimg.cc/YCYkTgSd/BD14C110-EB7C-4E2B-8D57-97A5EE756A9D.jpg",
+    sizes: "S,M,L,XL",
+    description: "Hoodie Shadow"
+  },
+
+  {
+    name: "Hoodie Shadow 6",
+    price: 2600,
+    image: "https://i.postimg.cc/13wPb6z0/E5BA47BB-383E-405B-BFAA-75755F697FA3.jpg",
+    sizes: "S,M,L,XL",
+    description: "Hoodie Shadow"
   }
 
-  .topbar nav {
+];
 
-    display: none;
+
+let products = [];
+let delivery = [];
+let cart = [];
+
+
+async function api(path, options = {}) {
+
+  const response = await fetch(
+    SUPABASE_URL + "/rest/v1/" + path,
+    {
+      ...options,
+
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: "Bearer " + SUPABASE_KEY,
+        "Content-Type": "application/json",
+        ...(options.headers || {})
+      }
+    }
+  );
+
+  if (!response.ok) {
+
+    throw new Error(
+      await response.text()
+    );
+
   }
 
-  .hero {
+  const text = await response.text();
 
-    grid-template-columns: 1fr;
+  return text ? JSON.parse(text) : [];
 
-    padding: 45px 20px;
+}
+
+
+async function loadAll() {
+
+  try {
+
+    products = await api(
+      "products?select=*&order=id.asc"
+    );
+
+
+    if (!products.length) {
+
+      for (const product of INITIAL_PRODUCTS) {
+
+        await api(
+          "products",
+          {
+            method: "POST",
+
+            headers: {
+              Prefer: "return=minimal"
+            },
+
+            body: JSON.stringify(product)
+          }
+        );
+
+      }
+
+      products = await api(
+        "products?select=*&order=id.asc"
+      );
+
+    }
+
+
+    delivery = await api(
+      "delivery?select=*&order=id.asc"
+    );
+
+
+    renderProducts();
+
+    renderWilayas();
+
+    updateCart();
+
   }
 
-  .hero-images img:first-child {
+  catch (error) {
 
-    height: 300px;
-  }
+    console.error(error);
 
-  .hero-images img {
+    document.getElementById(
+      "productGrid"
+    ).innerHTML =
 
-    height: 200px;
-  }
+      `<div class="loading">
+        تعذر الاتصال بقاعدة البيانات.
+        تأكد من Publishable Key في script.js.
+      </div>`;
 
-  .features {
-
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .products-grid,
-  .order-wrap {
-
-    grid-template-columns: 1fr;
-  }
-
-  .section,
-  .order-section {
-
-    padding: 60px 20px;
-  }
-
-  .product-card img {
-
-    height: 350px;
-  }
-
-  footer {
-
-    flex-wrap: wrap;
-  }
-
-  .hero h1 {
-
-    font-size: 65px;
-  }
-
-  .admin-form {
-
-    grid-template-columns: 1fr;
-  }
-
-  .admin-row {
-
-    align-items: flex-start;
-
-    flex-wrap: wrap;
   }
 
 }
+
+
+function renderProducts() {
+
+  const grid =
+    document.getElementById(
+      "productGrid"
+    );
+
+
+  if (!products.length) {
+
+    grid.innerHTML =
+      `<div class="loading">
+        لا توجد منتجات حاليًا
+      </div>`;
+
+    return;
+  }
+
+
+  grid.innerHTML =
+    products.map(
+      (product, index) => `
+
+      <article class="product-card">
+
+        <img
+          src="${escapeHTML(product.image)}"
+          alt="${escapeHTML(product.name)}"
+        >
+
+        <div class="product-info">
+
+          <h3>
+            ${escapeHTML(product.name)}
+          </h3>
+
+          <div class="price">
+            ${Number(product.price).toLocaleString("fr-DZ")} DA
+          </div>
+
+          <div class="sizes">
+            Tailles:
+            ${escapeHTML(product.sizes || "S,M,L,XL")}
+          </div>
+
+          <button
+            class="add-btn"
+            onclick="addToCart(${index})"
+          >
+            AJOUTER AU PANIER
+          </button>
+
+        </div>
+
+      </article>
+
+    `
+    ).join("");
+
+}
+
+
+function renderWilayas() {
+
+  const select =
+    document.getElementById("wilaya");
+
+
+  select.innerHTML =
+    `<option value="">
+      Sélectionnez votre wilaya
+    </option>` +
+
+    delivery.map(
+      item => `
+
+      <option value="${item.id}">
+        ${escapeHTML(item.name)}
+      </option>
+
+    `
+    ).join("");
+
+}
+
+
+function addToCart(index) {
+
+  cart.push(
+    products[index]
+  );
+
+  updateCart();
+
+  scrollToOrder();
+
+}
+
+
+function removeCart(index) {
+
+  cart.splice(index, 1);
+
+  updateCart();
+
+}
+
+
+function updateCart() {
+
+  document.getElementById(
+    "cartCount"
+  ).textContent = cart.length;
+
+
+  const cartBox =
+    document.getElementById(
+      "cartList"
+    );
+
+
+  const subtotal =
+    cart.reduce(
+      (total, product) =>
+        total + Number(product.price),
+      0
+    );
+
+
+  if (cart.length) {
+
+    cartBox.innerHTML =
+      cart.map(
+        (product, index) => `
+
+        <div class="cart-item">
+
+          <span>
+            ${escapeHTML(product.name)}
+          </span>
+
+          <b>
+
+            ${Number(product.price)
+              .toLocaleString("fr-DZ")} DA
+
+            <button
+              onclick="removeCart(${index})"
+            >
+              ×
+            </button>
+
+          </b>
+
+        </div>
+
+      `
+      ).join("");
+
+  }
+
+  else {
+
+    cartBox.innerHTML =
+      "<p>Votre panier est vide.</p>";
+
+  }
+
+
+  document.getElementById(
+    "subtotal"
+  ).textContent =
+    subtotal.toLocaleString("fr-DZ")
+    + " DA";
+
+
+  updateDelivery();
+
+}
+
+
+function updateDelivery() {
+
+  const selected =
+    delivery.find(
+      item =>
+        String(item.id) ===
+        String(
+          document.getElementById(
+            "wilaya"
+          ).value
+        )
+    );
+
+
+  const type =
+    document.getElementById(
+      "deliveryType"
+    ).value;
+
+
+  let fee = 0;
+
+
+  if (selected) {
+
+    if (type === "desk") {
+
+      fee =
+        Number(
+          selected.stop_price || 0
+        );
+
+    }
+
+    else if (type === "home") {
+
+      fee =
+        Number(
+          selected.price || 0
+        );
+
+    }
+
+  }
+
+
+  const subtotal =
+    cart.reduce(
+      (total, product) =>
+        total + Number(product.price),
+      0
+    );
+
+
+  document.getElementById(
+    "deliveryFee"
+  ).textContent =
+    fee.toLocaleString("fr-DZ")
+    + " DA";
+
+
+  document.getElementById(
+    "total"
+  ).textContent =
+    (subtotal + fee)
+      .toLocaleString("fr-DZ")
+    + " DA";
+
+}
+
+
+async function sendOrder(event) {
+
+  event.preventDefault();
+
+
+  if (!cart.length) {
+
+    alert(
+      "أضف منتجًا إلى السلة أولاً"
+    );
+
+    return;
+  }
+
+
+  const name =
+    document.getElementById(
+      "customerName"
+    ).value.trim();
+
+
+  const phone =
+    document.getElementById(
+      "customerPhone"
+    ).value.trim();
+
+
+  const selected =
+    delivery.find(
+      item =>
+        String(item.id) ===
+        String(
+          document.getElementById(
+            "wilaya"
+          ).value
+        )
+    );
+
+
+  const type =
+    document.getElementById(
+      "deliveryType"
+    ).value;
+
+
+  const address =
+    document.getElementById(
+      "address"
+    ).value.trim();
+
+
+  const fee =
+    selected
+      ? (
+        type === "desk"
+          ? Number(selected.stop_price || 0)
+          : Number(selected.price || 0)
+        )
+      : 0;
+
+
+  const subtotal =
+    cart.reduce(
+      (total, product) =>
+        total + Number(product.price),
+      0
+    );
+
+
+  const total =
+    subtotal + fee;
+
+
+  const items =
+    cart.map(
+      product => ({
+        id: product.id,
+        name: product.name,
+        price: product.price
+      })
+    );
+
+
+  try {
+
+    await api(
+      "orders",
+      {
+        method: "POST",
+
+        headers: {
+          Prefer: "return=minimal"
+        },
+
+        body: JSON.stringify({
+
+          customer_name: name,
+
+          phone: phone,
+
+          wilaya:
+            selected?.name || "",
+
+          address: address,
+
+          total: total,
+
+          status: "جديد",
+
+          items: items
+
+        })
+
+      }
+    );
+
+
+    const whatsappMessage =
+
+      `Bonjour SHADOW%0A%0A` +
+
+      `Nom: ${encodeURIComponent(name)}%0A` +
+
+      `Tel: ${encodeURIComponent(phone)}%0A` +
+
+      `Wilaya: ${encodeURIComponent(
+        selected?.name || ""
+      )}%0A` +
+
+      `Livraison: ${
+        type === "desk"
+          ? "Stop desk"
+          : "Domicile"
+      }%0A` +
+
+      `Adresse: ${encodeURIComponent(address)}%0A` +
+
+      `Produits: ${encodeURIComponent(
+        items
+          .map(item => item.name)
+          .join(", ")
+      )}%0A` +
+
+      `Total: ${total} DA`;
+
+
+    window.open(
+      "https://wa.me/" +
+      WHATSAPP +
+      "?text=" +
+      whatsappMessage,
+      "_blank"
+    );
+
+
+    alert(
+      "تم تسجيل طلبك بنجاح"
+    );
+
+
+    cart = [];
+
+    updateCart();
+
+    event.target.reset();
+
+    updateDelivery();
+
+  }
+
+  catch (error) {
+
+    console.error(error);
+
+    alert(
+      "حدث خطأ أثناء إرسال الطلب"
+    );
+
+  }
+
+}
+
+
+function openAdminLogin() {
+
+  document
+    .getElementById("loginModal")
+    .classList.add("show");
+
+  document
+    .getElementById("adminPassword")
+    .focus();
+
+}
+
+
+function closeAdminLogin() {
+
+  document
+    .getElementById("loginModal")
+    .classList.remove("show");
+
+}
+
+
+function loginAdmin() {
+
+  const password =
+    document.getElementById(
+      "adminPassword"
+    ).value;
+
+
+  if (
+    password ===
+    ADMIN_PASSWORD
+  ) {
+
+    sessionStorage.setItem(
+      "shadow_admin",
+      "1"
+    );
+
+    location.href =
+      "admin.html";
+
+  }
+
+  else {
+
+    document.getElementById(
+      "loginError"
+    ).textContent =
+      "كلمة المرور غير صحيحة";
+
+  }
+
+}
+
+
+function scrollToOrder() {
+
+  document
+    .getElementById("order")
+    .scrollIntoView({
+      behavior: "smooth"
+    });
+
+}
+
+
+function escapeHTML(value) {
+
+  return String(
+    value ?? ""
+  ).replace(
+    /[&<>"']/g,
+    character => ({
+
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#039;"
+
+    })[character]
+  );
+
+}
+
+
+document.addEventListener(
+  "DOMContentLoaded",
+  loadAll
+);
