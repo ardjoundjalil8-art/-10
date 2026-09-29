@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SHADOW | Hoodie Store</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+  <button class="admin-lock" onclick="openAdmin()">🔒</button>
+
+  <div class="logo">SHADOW</div>
+
+  <nav>
+    <a href="#home">الرئيسية</a>
+    <a href="#products">المنتجات</a>
+    <a href="#how">كيف تطلب؟</a>
+    <a href="#order">اطلب الآن</a>
+  </nav>
+</header>
+
+<main>
+
+<section id="home" class="hero">
+  <div>
+    <span class="tag">HOODIE-SHADOW</span>
+    <h1>STYLE IN THE SHADOW</h1>
+    <p>هوديات بجودة وأناقة — اطلب مباشرة عبر WhatsApp.</p>
+    <a class="btn" href="#products">شوف المنتجات</a>
+  </div>
+</section>
+
+<section id="products" class="section">
+  <h2>المنتجات</h2>
+  <div id="productGrid" class="grid"></div>
+</section>
+
+<section id="how" class="section how">
+  <h2>كيف تطلب؟</h2>
+
+  <div class="steps">
+    <div>
+      <b>01</b>
+      <span>اختار المنتج</span>
+    </div>
+
+    <div>
+      <b>02</b>
+      <span>اختار المقاس</span>
+    </div>
+
+    <div>
+      <b>03</b>
+      <span>اكتب الولاية</span>
+    </div>
+
+    <div>
+      <b>04</b>
+      <span>أكد الطلب عبر WhatsApp</span>
+    </div>
+  </div>
+</section>
+
+<section id="order" class="section order-section">
+
+  <h2>اطلب الآن</h2>
+
+  <div class="order-box">
+
+    <div id="cartList"></div>
+
+    <div class="row">
+
+      <label>
+        الاسم
+        <input id="customerName" placeholder="اسمك">
+      </label>
+
+      <label>
+        رقم الهاتف
+        <input
+          id="customerPhone"
+          placeholder="05/06/07..."
+          inputmode="tel"
+        >
+      </label>
+
+    </div>
+
+    <label>
+      الولاية
+      <select id="wilaya"></select>
+    </label>
+
+    <div class="summary">
+
+      <span>
+        المنتجات:
+        <b id="subtotal">0</b> DA
+      </span>
+
+      <span>
+        التوصيل:
+        <b id="deliveryFee">0</b> DA
+      </span>
+
+      <strong>
+        المجموع:
+        <b id="total">0</b> DA
+      </strong>
+
+    </div>
+
+    <button class="btn full" onclick="sendOrder()">
+      إرسال الطلب عبر WhatsApp
+    </button>
+
+  </div>
+
+</section>
+
+</main>
+
+<footer>
+  © 2026 SHADOW — All rights reserved.
+</footer>
+
+
+<!-- ADMIN -->
+
+<div id="adminModal" class="modal hidden">
+
+  <div class="modal-card">
+
+    <button class="close" onclick="closeAdmin()">×</button>
+
+    <div id="loginBox">
+
+      <h2>Admin</h2>
+
+      <input
+        id="adminPassword"
+        type="password"
+        placeholder="كلمة السر"
+      >
+
+      <button class="btn full" onclick="loginAdmin()">
+        دخول
+      </button>
+
+    </div>
+
+
+    <div id="adminPanel" class="hidden">
+
+      <h2>لوحة التحكم</h2>
+
+      <div class="stats">
+
+        <div>
+          الطلبات
+          <strong id="statOrders">0</strong>
+        </div>
+
+        <div>
+          المبيعات
+          <strong id="statSales">0 DA</strong>
+        </div>
+
+        <div>
+          الربح
+          <strong id="statProfit">0 DA</strong>
+        </div>
+
+      </div>
+
+
+      <div class="admin-tabs">
+
+        <button onclick="showAdminTab('productsTab')">
+          المنتجات
+        </button>
+
+        <button onclick="showAdminTab('deliveryTab')">
+          التوصيل
+        </button>
+
+        <button onclick="showAdminTab('ordersTab')">
+          الطلبات
+        </button>
+
+        <button onclick="showAdminTab('settingsTab')">
+          الإعدادات
+        </button>
+
+      </div>
+
+
+      <!-- PRODUCTS -->
+
+      <div id="productsTab" class="admin-tab">
+
+        <h3>إضافة منتج</h3>
+
+        <div class="row">
+
+          <input
+            id="newName"
+            placeholder="اسم المنتج"
+          >
+
+          <input
+            id="newPrice"
+            type="number"
+            placeholder="السعر"
+          >
+
+          <input
+            id="newImage"
+            placeholder="رابط الصورة"
+          >
+
+        </div>
+
+        <input
+          id="newSizes"
+          placeholder="المقاسات: S,M,L,XL"
+        >
+
+        <textarea
+          id="newDescription"
+          placeholder="الوصف"
+        ></textarea>
+
+        <button class="btn" onclick="addProduct()">
+          إضافة
+        </button>
+
+        <div id="adminProducts" class="admin-list"></div>
+
+      </div>
+
+
+      <!-- DELIVERY -->
+
+      <div id="deliveryTab" class="admin-tab hidden">
+
+        <h3>مناطق التوصيل</h3>
+
+        <div class="row">
+
+          <input
+            id="deliveryName"
+            placeholder="الولاية"
+          >
+
+          <input
+            id="deliveryPrice"
+            type="number"
+            placeholder="السعر"
+          >
+
+          <button class="btn" onclick="addDelivery()">
+            إضافة
+          </button>
+
+        </div>
+
+        <div id="adminDelivery" class="admin-list"></div>
+
+      </div>
+
+
+      <!-- ORDERS -->
+
+      <div id="ordersTab" class="admin-tab hidden">
+
+        <h3>الطلبات</h3>
+
+        <div id="adminOrders" class="admin-list"></div>
+
+      </div>
+
+
+      <!-- SETTINGS -->
+
+      <div id="settingsTab" class="admin-tab hidden">
+
+        <h3>الإعدادات</h3>
+
+        <label>
+          سعر افتراضي للمنتج
+
+          <input
+            id="defaultPrice"
+            type="number"
+          >
+
+        </label>
+
+        <label>
+          رقم WhatsApp
+
+          <input id="waNumber">
+
+        </label>
+
+        <button class="btn" onclick="saveSettings()">
+          حفظ الإعدادات
+        </button>
+
+        <button
+          class="danger full"
+          onclick="deleteAllProducts()"
+        >
+          حذف جميع المنتجات
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
