@@ -64,6 +64,70 @@ const INITIAL_PRODUCTS = [
 ];
 
 
+const ALL_WILAYAS = [
+
+  "أدرار",
+  "الشلف",
+  "الأغواط",
+  "أم البواقي",
+  "باتنة",
+  "بجاية",
+  "بسكرة",
+  "بشار",
+  "البليدة",
+  "البويرة",
+  "تمنراست",
+  "تبسة",
+  "تلمسان",
+  "تيارت",
+  "تيزي وزو",
+  "الجزائر",
+  "الجلفة",
+  "جيجل",
+  "سطيف",
+  "سعيدة",
+  "سكيكدة",
+  "سيدي بلعباس",
+  "عنابة",
+  "قالمة",
+  "قسنطينة",
+  "المدية",
+  "مستغانم",
+  "المسيلة",
+  "معسكر",
+  "ورقلة",
+  "وهران",
+  "البيض",
+  "إليزي",
+  "برج بوعريريج",
+  "بومرداس",
+  "الطارف",
+  "تندوف",
+  "تيسمسيلت",
+  "الوادي",
+  "خنشلة",
+  "سوق أهراس",
+  "تيبازة",
+  "ميلة",
+  "عين الدفلى",
+  "النعامة",
+  "عين تموشنت",
+  "غرداية",
+  "غليزان",
+  "تيميمون",
+  "برج باجي مختار",
+  "أولاد جلال",
+  "بني عباس",
+  "عين صالح",
+  "عين قزام",
+  "تقرت",
+  "جانت",
+  "المغير",
+  "المنيعة"
+
+];
+
+
 let products = [];
 let delivery = [];
 let cart = [];
@@ -96,6 +160,53 @@ async function api(path, options = {}) {
   const text = await response.text();
 
   return text ? JSON.parse(text) : [];
+
+}
+
+
+async function addMissingWilayas() {
+
+  const existingNames =
+    delivery.map(
+      item =>
+        String(item.name)
+          .trim()
+    );
+
+  const missing =
+    ALL_WILAYAS.filter(
+      name =>
+        !existingNames.includes(name)
+    );
+
+  if (!missing.length) {
+    return;
+  }
+
+  const newWilayas =
+    missing.map(
+      name => ({
+        name: name,
+        price: 0,
+        stop_price: 0
+      })
+    );
+
+  await api(
+    "delivery",
+    {
+      method: "POST",
+
+      headers: {
+        Prefer: "return=minimal"
+      },
+
+      body:
+        JSON.stringify(
+          newWilayas
+        )
+    }
+  );
 
 }
 
@@ -133,6 +244,14 @@ async function loadAll() {
       );
 
     }
+
+
+    delivery = await api(
+      "delivery?select=*&order=id.asc"
+    );
+
+
+    await addMissingWilayas();
 
 
     delivery = await api(
@@ -494,9 +613,15 @@ async function sendOrder(event) {
   const items =
     cart.map(
       product => ({
+
         id: product.id,
+
         name: product.name,
-        price: product.price
+
+        price: product.price,
+
+        image: product.image
+
       })
     );
 
