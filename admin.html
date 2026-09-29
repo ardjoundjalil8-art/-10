@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>
+    إدارة SHADOW
+  </title>
+
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
+
+</head>
+
+
+<body class="admin-page">
+
+
+<header class="topbar">
+
+  <a
+    class="brand"
+    href="index.html"
+  >
+
+    <img
+      src="https://i.postimg.cc/FH3mwcKj/1F620D3C-AE36-4FE0-849D-08DFCEDDB4B2.jpg"
+      alt="SHADOW"
+    >
+
+    <span>
+      SHADOW
+    </span>
+
+  </a>
+
+
+  <a
+    class="admin-btn"
+    href="index.html"
+  >
+    العودة للموقع
+  </a>
+
+</header>
+
+
+<main class="admin-wrap">
+
+  <h1>
+    لوحة الإدارة
+  </h1>
+
+
+  <div class="admin-tabs">
+
+    <button onclick="showTab('products')">
+      المنتجات
+    </button>
+
+    <button onclick="showTab('delivery')">
+      التوصيل
+    </button>
+
+    <button onclick="showTab('orders')">
+      الطلبات
+    </button>
+
+    <button onclick="showTab('settings')">
+      الإعدادات
+    </button>
+
+  </div>
+
+
+  <!-- PRODUCTS -->
+
+  <section
+    id="products"
+    class="admin-tab"
+  >
+
+    <h2>
+      إضافة منتج
+    </h2>
+
+
+    <div class="admin-form">
+
+      <input
+        id="pName"
+        placeholder="اسم المنتج"
+      >
+
+      <input
+        id="pPrice"
+        type="number"
+        value="2600"
+        placeholder="السعر"
+      >
+
+      <input
+        id="pImage"
+        placeholder="رابط الصورة"
+      >
+
+      <input
+        id="pSizes"
+        value="S,M,L,XL"
+        placeholder="المقاسات"
+      >
+
+      <button onclick="addProduct()">
+        إضافة
+      </button>
+
+    </div>
+
+
+    <div id="productsList"></div>
+
+  </section>
+
+
+  <!-- DELIVERY -->
+
+  <section
+    id="delivery"
+    class="admin-tab hidden"
+  >
+
+    <h2>
+      أسعار التوصيل
+    </h2>
+
+
+    <p class="muted">
+
+      الأسعار الموجودة هنا هي فقط الأسعار
+      التي أرسلتها من الجدول.
+
+    </p>
+
+
+    <div class="admin-form">
+
+      <input
+        id="dName"
+        placeholder="الولاية"
+      >
+
+      <input
+        id="dPrice"
+        type="number"
+        placeholder="Tarif"
+      >
+
+      <input
+        id="dStop"
+        type="number"
+        placeholder="Stop desk"
+      >
+
+      <button onclick="addDelivery()">
+        إضافة
+      </button>
+
+    </div>
+
+
+    <div id="deliveryList"></div>
+
+  </section>
+
+
+  <!-- ORDERS -->
+
+  <section
+    id="orders"
+    class="admin-tab hidden"
+  >
+
+    <h2>
+      الطلبات
+    </h2>
+
+
+    <div id="ordersList"></div>
+
+  </section>
+
+
+  <!-- SETTINGS -->
+
+  <section
+    id="settings"
+    class="admin-tab hidden"
+  >
+
+    <h2>
+      الإعدادات
+    </h2>
+
+
+    <div class="admin-form">
+
+      <input
+        id="waNumber"
+        value="213696380625"
+        placeholder="WhatsApp"
+      >
+
+      <button onclick="saveSettings()">
+        حفظ
+      </button>
+
+    </div>
+
+
+    <button
+      class="danger"
+      onclick="deleteAllProducts()"
+    >
+      حذف كل المنتجات
+    </button>
+
+  </section>
+
+</main>
+
+
+<script src="admin.js"></script>
+
+</body>
+
+</html>
