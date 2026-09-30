@@ -4,9 +4,6 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
   "sb_publishable_iNdVPUDh7LRiQ27JX3smyA_C345zSB_";
 
-const ADMIN_PASSWORD =
-  "2412822010";
-
 
 if (
   sessionStorage.getItem("shadow_admin") !== "1"
@@ -396,6 +393,13 @@ async function refresh() {
 
             </select>
 
+            <button
+              class="danger"
+              onclick="deleteOrder(${order.id})"
+            >
+              🗑️ حذف الطلب
+            </button>
+
           </div>
 
           `;
@@ -658,7 +662,7 @@ async function toggleProduct(
 
   alert(
     newHidden
-      ? "تم إخفاء المنتج 👁️"
+      ? "تم إخفاء المنتج 🙈"
       : "تم إظهار المنتج 👁️"
   );
 
@@ -819,6 +823,134 @@ async function statusOrder(
       })
 
     }
+  );
+
+}
+
+
+/* =========================
+   DELETE ORDER
+========================= */
+
+async function deleteOrder(id) {
+
+  if (
+    !confirm(
+      "هل تريد حذف هذا الطلب نهائيًا؟"
+    )
+  ) {
+
+    return;
+
+  }
+
+
+  await api(
+    "orders?id=eq." + id,
+    {
+      method: "DELETE"
+    }
+  );
+
+
+  await refresh();
+
+}
+
+
+/* =========================
+   CHANGE ADMIN PASSWORD
+========================= */
+
+function changeAdminPassword() {
+
+  const currentPassword =
+    prompt(
+      "اكتب كود الدخول الحالي:"
+    );
+
+
+  if (currentPassword === null) {
+    return;
+  }
+
+
+  const savedPassword =
+    localStorage.getItem(
+      "shadow_admin_password"
+    ) || "2412822010";
+
+
+  if (
+    currentPassword !==
+    savedPassword
+  ) {
+
+    alert(
+      "كود الدخول الحالي غير صحيح ❌"
+    );
+
+    return;
+
+  }
+
+
+  const newPassword =
+    prompt(
+      "اكتب كود الدخول الجديد:"
+    );
+
+
+  if (newPassword === null) {
+    return;
+  }
+
+
+  const cleanPassword =
+    newPassword.trim();
+
+
+  if (
+    cleanPassword.length < 4
+  ) {
+
+    alert(
+      "الكود الجديد يجب أن يكون 4 أحرف أو أرقام على الأقل"
+    );
+
+    return;
+
+  }
+
+
+  const confirmPassword =
+    prompt(
+      "أعد كتابة كود الدخول الجديد:"
+    );
+
+
+  if (
+    confirmPassword !==
+    cleanPassword
+  ) {
+
+    alert(
+      "الكودان غير متطابقين ❌"
+    );
+
+    return;
+
+  }
+
+
+  localStorage.setItem(
+    "shadow_admin_password",
+    cleanPassword
+  );
+
+
+  alert(
+    "تم تغيير كود الدخول بنجاح ✅"
   );
 
 }
